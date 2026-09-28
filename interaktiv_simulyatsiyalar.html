@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6-Sinf Fizika: Interaktiv Simulyatsiyalar</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #2ecc71;
+            --warning: #e67e22;
+            --danger: #e74c3c;
+            --bg: #f4f7f6;
+            --card: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: #333;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        header p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            border: none;
+            background: #ddd;
+            color: #333;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .sim-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 20px;
+            display: none;
+        }
+
+        .sim-container.active {
+            display: block;
+        }
+
+        .sim-title {
+            color: var(--primary);
+            margin-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .sim-canvas-area {
+            width: 100%;
+            height: 350px;
+            background: #eef2f3;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-start { background: var(--success); }
+        .btn-stop { background: var(--warning); }
+        .btn-reset { background: var(--danger); }
+        .btn:hover { opacity: 0.85; }
+
+        .info-panel {
+            background: #f8f9fa;
+            border-left: 4px solid var(--accent);
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        /* 1-Simulyatsiya elementlari */
+        #ball1, #ball2 {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            position: absolute;
+            top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        #ball1 { background: #e74c3c; left: 30%; }
+        #ball2 { background: #3498db; left: 60%; }
+        .ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 20px;
+            background: #27ae60;
+        }
+
+        /* 2-Simulyatsiya Timeline */
+        .timeline-nav {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding: 10px 0;
+        }
+        .time-node {
+            min-width: 120px;
+            padding: 10px;
+            background: #eee;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .time-node.selected {
+            border-color: var(--accent);
+            background: #e3f2fd;
+        }
+        .scientist-card {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-top: 15px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .scientist-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        /* 3-Simulyatsiya Grid */
+        .physics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .branch-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .branch-card:hover, .branch-card.active {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .branch-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .sim-canvas-area { height: 250px; }
+            .scientist-card { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>6-Sinf Fizika: Darslik Interaktiv Simulyatsiyalari</h1>
+        <p>1-Mavzu: Kirish. Fizika fani bilan tanishish</p>
+    </header>
+
+    <div class="tab-buttons">
+        <button class="tab-btn active" onclick="switchTab(1)">1. Fizika va Hodisalar</button>
+        <button class="tab-btn" onclick="switchTab(2)">2. Vaqt Mashinasi (Tarix)</button>
+        <button class="tab-btn" onclick="switchTab(3)">3. Fizika Olami (Bo‘limlar)</button>
+    </div>
+
+    <!-- 1-SIMULYATSIYA -->
+    <div id="sim1" class="sim-container active">
+        <h2 class="sim-title">1-Reja Simulyatsiyasi: Erkin Tushish Hodisasi</h2>
+        <div class="sim-canvas-area" id="canvas1">
+            <div id="ball1">O'g'ir</div>
+            <div id="ball2">Yengil</div>
+            <div class="ground"></div>
+        </div>
+        <div class="controls">
+            <button class="btn btn-start" onclick="startSim1()">Boshlash</button>
+            <button class="btn btn-stop" onclick="stopSim1()">To‘xtatish</button>
+            <button class="btn btn-reset" onclick="resetSim1()">Qayta boshlash</button>
+            <label style="margin-left: 15px;">
+                <input type="checkbox" id="airResist" onchange="resetSim1()"> Havo qarshiligi mavjud
+            </label>
+        </div>
+        <div class="info-panel" id="info1">
+            <b>Tushuntirish:</b> "Boshlash" tugmasini bosing va og‘ir hamda yengil jismlarning tushishini kuzating. Havo qarshiligi o'chirilganda ikkala jism ham bir xil vaqtda yerga tushadi!
+        </div>
+    </div>
+
+    <!-- 2-SIMULYATSIYA -->
+    <div id="sim2" class="sim-container">
+        <h2 class="sim-title">2-Reja Simulyatsiyasi: Fizika Tarixi Vaqt Mashinasi</h2>
+        <div class="timeline-nav" id="timelineNav"></div>
+        <div class="scientist-card">
+            <div class="scientist-avatar" id="scIcon">👨‍🔬</div>
+            <div>
+                <h3 id="scName">Olim nomi</h3>
+                <p style="color: var(--accent); font-weight: bold;" id="scEra">Davri</p>
+                <p id="scDesc" style="margin-top: 8px;">Kashfiyoti va ilmiy hissasi haqida ma'lumot...</p>
+            </div>
+        </div>
+        <div class="info-panel" style="margin-top: 15px;">
+            <b>O‘quvchi uchun:</b> Yuqoridagi vaqt chizig‘idan olimlarni tanlang va ularning fizika faniga qo‘shgan buyuk hissalarini o‘rganing!
+        </div>
+    </div>
+
+    <!-- 3-SIMULYATSIYA -->
+    <div id="sim3" class="sim-container">
+        <h2 class="sim-title">3-Reja Simulyatsiyasi: Fizika Olami Bo‘limlari</h2>
+        <div class="physics-grid" id="branchesGrid"></div>
+        <div class="sim-canvas-area" id="canvas3" style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
+            <div id="branchAnim" style="font-size: 4rem;">🔬</div>
+            <h3 id="branchTitle" style="margin-top: 10px;">Bo'limni tanlang</h3>
+            <p id="branchDesc" style="text-align: center; padding: 0 20px; color: #555; margin-top: 5px;"></p>
+        </div>
+        <div class="info-panel">
+            <b>Qiziqarli fakt:</b> <span id="branchFact">Fizika bo'limini tanlang va u haqida faktni o'qing.</span>
+        </div>
+    </div>
+
+    <script>
+        // TAB SWITCHING
+        function switchTab(num) {
+            document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', idx === num - 1);
+            });
+            document.querySelectorAll('.sim-container').forEach((sim, idx) => {
+                sim.classList.toggle('active', idx === num - 1);
+            });
+        }
+
+        // --- SIMULYATSIYA 1 LOGIKASI ---
+        let anim1;
+        let pos1 = 20, pos2 = 20;
+        let speed1 = 0, speed2 = 0;
+        let running1 = false;
+
+        function startSim1() {
+            if (running1) return;
+            running1 = true;
+            const air = document.getElementById('airResist').checked;
+            
+            anim1 = setInterval(() => {
+                speed1 += 0.4;
+                speed2 += air ? 0.2 : 0.4;
+
+                pos1 += speed1;
+                pos2 += speed2;
+
+                if (pos1 >= 290) pos1 = 290;
+                if (pos2 >= 290) pos2 = 290;
+
+                document.getElementById('ball1').style.top = pos1 + 'px';
+                document.getElementById('ball2').style.top = pos2 + 'px';
+
+                if (pos1 >= 290 && pos2 >= 290) {
+                    clearInterval(anim1);
+                    running1 = false;
+                    document.getElementById('info1').innerHTML = `<b>Natija:</b> Jismlar Yerga tushdi. ${air ? 'Havo borligida og‘irroq jism tezroq tushdi.' : 'Vakuumda (havosiz) ikkala jism ham TENG vaqtda tushdi!'}`;
+                }
+            }, 30);
+        }
+
+        function stopSim1() {
+            clearInterval(anim1);
+            running1 = false;
+        }
+
+        function resetSim1() {
+            stopSim1();
+            pos1 = 20; pos2 = 20;
+            speed1 = 0; speed2 = 0;
+            document.getElementById('ball1').style.top = '20px';
+            document.getElementById('ball2').style.top = '20px';
+            document.getElementById('info1').innerHTML = '<b>Tushuntirish:</b> "Boshlash" tugmasini bosing va harakatni kuzating.';
+        }
+
+        // --- SIMULYATSIYA 2 LOGIKASI ---
+        const scientists = [
+            { name: "Aristotel", era: "m.avv. 384–322", icon: "🏛️", desc: "Birinchi bo‘lib 'Fizika' atamasini va tabiatni kuzatish usulini fanga kiritdi." },
+            { name: "Arximed", era: "m.avv. 287–212", icon: "👑", desc: "Suyuqlikda suzish qonuni va richag (dastak) mexanizmini kashf qildi." },
+            { name: "Ibn Sino va Beruniy", era: "980–1037", icon: "📜", desc: "Sharq uyg'onish davri olimlari. Jismlar harakati, nur tarqalishi va zichlikni tadqiq etishgan." },
+            { name: "Galileo Galiley", era: "1564–1642", icon: "🔭", desc: "Eksperimental fizikaga asos soldi. Pizan minorasida tajriba o'tkazib teleskopni yaratdi." },
+            { name: "Isaak Nyuton", era: "1643–1727", icon: "🍎", desc: "Butunjahon tortishish qonuni va harakatning 3 ta asosiy qonunini yaratdi." },
+            { name: "Maykl Faradey", era: "1791–1867", icon: "⚡", desc: "Elektromagnit induksiyani kashf qildi. Elektr dvigatellariga poydevor qo'ydi." },
+            { name: "Albert Eynshteyn", era: "1879–1955", icon: "🧠", desc: "Nisbiylik nazariyasini yaratdi. Vaqt va fazo tushunchalarini inqilob qildi." }
+        ];
+
+        const timelineNav = document.getElementById('timelineNav');
+        scientists.forEach((sc, idx) => {
+            const node = document.createElement('div');
+            node.className = `time-node ${idx === 0 ? 'selected' : ''}`;
+            node.innerHTML = `<b>${sc.name}</b><br><small>${sc.era}</small>`;
+            node.onclick = () => selectScientist(idx);
+            timelineNav.appendChild(node);
+        });
+
+        function selectScientist(idx) {
+            document.querySelectorAll('.time-node').forEach((n, i) => n.classList.toggle('selected', i === idx));
+            const sc = scientists[idx];
+            document.getElementById('scName').innerText = sc.name;
+            document.getElementById('scEra').innerText = sc.era;
+            document.getElementById('scDesc').innerText = sc.desc;
+            document.getElementById('scIcon').innerText = sc.icon;
+        }
+        selectScientist(0);
+
+        // --- SIMULYATSIYA 3 LOGIKASI ---
+        const branches = [
+            { name: "Mexanika", icon: "🚗", desc: "Jismlarning harakatlanishi va o'zaro ta'sirini o'rganadi.", fact: "Samolyotlar mexanika qonunlari asosida parvoz qiladi." },
+            { name: "Termodinamika", icon: "🔥", desc: "Issiqlik, harorat va muzning erishi kabi hodisalarni o'rganadi.", fact: "Issiqlik bu molekulalarning tez tebranishidir." },
+            { name: "Elektr", icon: "💡", desc: "Elektr zaryadlari, tok va chiroq yonishini o'rganadi.", fact: "Yashin chaqnashi tabiatdagi eng kuchli elektr uchqunidir." },
+            { name: "Magnetizm", icon: "🧲", desc: "Magnit kuchi va Yerning magnit maydonini o'rganadi.", fact: "Yer sharining o'zi ulkan magnit hisoblanadi." },
+            { name: "Optika", icon: "🌈", desc: "Yorug'lik, ko'zoynak va kamalak hosil bo'lishini o'rganadi.", fact: "Yorug'lik tezligi soniyasiga 300,000 km ga teng!" },
+            { name: "Akustika", icon: "🎵", desc: "Tovush, musiqa va aks-sado hodisalarini o'rganadi.", fact: "Tovush suv ostida havodagidan 4 baravar tez tarqaladi." },
+            { name: "Atom Fizikasi", icon: "⚛️", desc: "Atomlar, ularning tuzilishi va energiyasini o'rganadi.", fact: "Igna uchiga 1 milliarddan ortiq atom sig'ishi mumkin." },
+            { name: "Astronomiya", icon: "🚀", desc: "Koinot, yulduzlar va planetalar harakatini o'rganadi.", fact: "Koinotda Yer poyafzalidagi qum zarralaridan ham ko'p yulduzlar bor." }
+        ];
+
+        const branchesGrid = document.getElementById('branchesGrid');
+        branches.forEach((b, idx) => {
+            const card = document.createElement('div');
+            card.className = `branch-card ${idx === 0 ? 'active' : ''}`;
+            card.innerHTML = `<div class="branch-icon">${b.icon}</div><div><b>${b.name}</b></div>`;
+            card.onclick = () => selectBranch(idx);
+            branchesGrid.appendChild(card);
+        });
+
+        function selectBranch(idx) {
+            document.querySelectorAll('.branch-card').forEach((c, i) => c.classList.toggle('active', i === idx));
+            const b = branches[idx];
+            document.getElementById('branchTitle').innerText = b.name;
+            document.getElementById('branchDesc').innerText = b.desc;
+            document.getElementById('branchAnim').innerText = b.icon;
+            document.getElementById('branchFact').innerText = b.fact;
+        }
+        selectBranch(0);
+    </script>
+</body>
+</html>
