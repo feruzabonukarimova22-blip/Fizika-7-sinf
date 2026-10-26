@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-sinf Fizika: Jismlarning harakati</title>
+    <!-- KaTeX CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <style>
+        :root {
+            --primary: #0066cc;
+            --primary-dark: #004b99;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px 10px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            font-size: 2rem;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: var(--primary-dark);
+            margin-top: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        .sim-box {
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        canvas {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .controls {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: var(--primary-dark);
+        }
+
+        .stats {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #0f172a;
+        }
+
+        .test-box {
+            background: #fafafa;
+            border-left: 4px solid var(--primary);
+            padding: 12px 18px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .option {
+            margin: 5px 0;
+            cursor: pointer;
+        }
+
+        .option label {
+            cursor: pointer;
+        }
+
+        .correct-ans {
+            color: green;
+            font-weight: bold;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .check-btn {
+            background: #10b981;
+            margin-top: 8px;
+        }
+        .check-btn:hover {
+            background: #059669;
+        }
+
+        .summary-box {
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
+            padding: 15px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>7-sinf Fizika. 1-§: Jismlarning harakati</h1>
+    <p><strong>Dars maqsadi:</strong> Mexanik harakat, harakatning nisbiyligi, sanoq jismi va sanoq sistemasi tushunchalarini interaktiv tarzda o'rganish.</p>
+
+    <!-- 1-BO'LIM -->
+    <h2>1-bo'lim. Mexanik harakat</h2>
+    <p><strong>Mexanik harakat</strong> — vaqt o'tishi bilan jismning boshqa jismlarga nisbatan fazodagi vaziyatining o'zgarishidir.</p>
+    <p>Tezlik hodiassi va masofa formulasi: $$v = rac{s}{t} \implies s = v \cdot t$$</p>
+
+    <div class="sim-box">
+        <canvas id="canvas1" width="700" height="150"></canvas>
+        <div class="controls">
+            <button onclick="start1()">Play</button>
+            <button onclick="pause1()">Pause</button>
+            <button onclick="reset1()">Reset</button>
+            <label>Tezlik (v): <input type="range" id="v1" min="1" max="30" value="10" oninput="updateV1()"> <span id="v1_val">10</span> m/s</label>
+        </div>
+        <div class="stats" id="stats1">Vaqt: 0.0 s | Masofa: 0.0 m | Tezlik: 10 m/s</div>
+    </div>
+
+    <div class="test-box">
+        <p><strong>1.1-Test:</strong> Mexanik harakat deb nimaga aytiladi?</p>
+        <div class="option"><input type="radio" name="q1" id="q1a"> <label for="q1a">A) Jismning faqat harorati o'zgarishiga</label></div>
+        <div class="option"><input type="radio" name="q1" id="q1b"> <label for="q1b">B) Vaqt o'tishi bilan jismning boshqa jismlarga nisbatan fazodagi o'rnining o'zgarishiga</label></div>
+        <div class="option"><input type="radio" name="q1" id="q1c"> <label for="q1c">C) Jismning massasi kamayishiga</label></div>
+        <button class="check-btn" onclick="checkQ('q1', 'q1b', 'ans1')">Tekshirish</button>
+        <div id="ans1" class="correct-ans">To'g'ri javob: B!</div>
+    </div>
+
+    <div class="test-box">
+        <p><strong>1.2-Test:</strong> Tezlik $v = 15	ext{ m/s}$ va vaqt $t = 10	ext{ s}$ bo'lsa, o'tilgan masofa $s$ qancha?</p>
+        <div class="option"><input type="radio" name="q2" id="q2a"> <label for="q2a">A) 150 m</label></div>
+        <div class="option"><input type="radio" name="q2" id="q2b"> <label for="q2b">B) 1.5 m</label></div>
+        <div class="option"><input type="radio" name="q2" id="q2c"> <label for="q2c">C) 25 m</label></div>
+        <button class="check-btn" onclick="checkQ('q2', 'q2a', 'ans2')">Tekshirish</button>
+        <div id="ans2" class="correct-ans">To'g'ri javob: A (150 m)!</div>
+    </div>
+
+    <!-- 2-BO'LIM -->
+    <h2>2-bo'lim. Harakatning nisbiyligi</h2>
+    <p>Jism harakati har doim tanlangan sanoq jismiga nisbatan qaraladi. Yo'lovchi poyezdga nisbatan tinch, Yergaga nisbatan harakatda bo'lishi mumkin.</p>
+    <p>Tezliklarni qo'shish: $$ec{v} = ec{v}_1 + ec{v}_2$$</p>
+
+    <div class="sim-box">
+        <canvas id="canvas2" width="700" height="150"></canvas>
+        <div class="controls">
+            <button onclick="start2()">Play</button>
+            <button onclick="pause2()">Pause</button>
+            <button onclick="reset2()">Reset</button>
+            <label>Poyezd (v1): <input type="range" id="v2_p" min="0" max="30" value="15" oninput="update2()"> <span id="v2_p_val">15</span> m/s</label>
+            <label>Odam (v2): <input type="range" id="v2_o" min="-5" max="5" value="2" oninput="update2()"> <span id="v2_o_val">2</span> m/s</label>
+        </div>
+        <div class="stats" id="stats2">Poyezdga nisbatan: 2 m/s | Yerga nisbatan tezlik: 17 m/s</div>
+    </div>
+
+    <div class="test-box">
+        <p><strong>2.1-Test:</strong> Avtobusda ketayotgan yo'lovchi kimga nisbatan tinch holatda bo'ladi?</p>
+        <div class="option"><input type="radio" name="q3" id="q3a"> <label for="q3a">A) Yo'l yoqasidagi daraxtlarga nisbatan</label></div>
+        <div class="option"><input type="radio" name="q3" id="q3b"> <label for="q3b">B) Yonida o'tirgan boshqa yo'lovchiga nisbatan</label></div>
+        <button class="check-btn" onclick="checkQ('q3', 'q3b', 'ans3')">Tekshirish</button>
+        <div id="ans3" class="correct-ans">To'g'ri javob: B!</div>
+    </div>
+
+    <!-- 3-BO'LIM -->
+    <h2>3-bo'lim. Sanoq jismi</h2>
+    <p>Jismning harakatda yoki tinch holatda ekanligini aniqlash uchun tanlab olingan qo'zg'almas jism <strong>sanoq jismi</strong> deyiladi.</p>
+
+    <div class="sim-box">
+        <canvas id="canvas3" width="700" height="150"></canvas>
+        <div class="controls">
+            <button onclick="start3()">Play</button>
+            <button onclick="pause3()">Pause</button>
+            <button onclick="reset3()">Reset</button>
+            <label>Sanoq jismi: 
+                <select id="refBody" onchange="reset3()">
+                    <option value="tree">Daraxt (Qo'zg'almas)</option>
+                    <option value="car2">Yilqitilgan Yashil Mashina</option>
+                </select>
+            </label>
+        </div>
+        <div class="stats" id="stats3">Sanoq jismiga nisbatan masofa: 0 m</div>
+    </div>
+
+    <!-- 4-BO'LIM -->
+    <h2>4-bo'lim. Sanoq sistemasi</h2>
+    <p>Sanoq jismi, unga bog'langan koordinatalar sistemasi va vaqtni o'lchaydigan soat birgalikda <strong>Sanoq sistemasi</strong>ni tashkil etadi.</p>
+    <p>1D koordinata tenglamasi: $$x(t) = x_0 + v_x \cdot t$$</p>
+
+    <div class="sim-box">
+        <canvas id="canvas4" width="700" height="150"></canvas>
+        <div class="controls">
+            <button onclick="start4()">Play</button>
+            <button onclick="pause4()">Pause</button>
+            <button onclick="reset4()">Reset</button>
+            <label>x0: <input type="range" id="x0_4" min="0" max="100" value="20" oninput="reset4()"> <span id="x0_4_val">20</span> m</label>
+            <label>v: <input type="range" id="v_4" min="1" max="20" value="5" oninput="reset4()"> <span id="v_4_val">5</span> m/s</label>
+        </div>
+        <div class="stats" id="stats4">Koordinata x = 20 m | Vaqt t = 0.0 s</div>
+    </div>
+
+    <!-- XULOSA VA UYGA VAZIFA -->
+    <h2>Dars xulosasi va Uyga vazifa</h2>
+    <div class="summary-box">
+        <p><strong>Xulosa:</strong> Mexanik harakat nisbiydir. Harakatni o'rganish uchun sanoq jismi, koordinata sistemasi va soatdan iborat sanoq sistemasi tanlanadi.</p>
+        <p><strong>Uyga vazifa:</strong> Darslikdagi 1-§ ni o'qish va uy-maktab masofasi bo'yicha ketadigan vaqtni $t = rac{s}{v}$ orqali hisoblash.</p>
+    </div>
+</div>
+
+<script>
+// Formula rendering helper
+function checkQ(group, correctId, ansId) {
+    let selected = document.querySelector(`input[name="${group}"]:checked`);
+    let ansDiv = document.getElementById(ansId);
+    if(selected && selected.id === correctId) {
+        ansDiv.style.display = "block";
+        ansDiv.style.color = "green";
+        ansDiv.innerText = "To'g'ri javob!";
+    } else {
+        ansDiv.style.display = "block";
+        ansDiv.style.color = "red";
+        ansDiv.innerText = "Noto'g'ri, qayta urinib ko'ring.";
+    }
+}
+
+// SIMULATION 1
+let c1 = document.getElementById("canvas1").getContext("2d");
+let t1 = 0, running1 = false, anim1, v1 = 10;
+function draw1() {
+    c1.clearRect(0,0,700,150);
+    // Draw road
+    c1.fillStyle = "#cbd5e1";
+    c1.fillRect(0, 100, 700, 40);
+    // Draw car
+    let x = (t1 * v1 * 5) % 650;
+    c1.fillStyle = "#0066cc";
+    c1.fillRect(x, 70, 50, 30);
+    c1.fillStyle = "#000";
+    c1.beginPath(); c1.arc(x+10, 105, 6, 0, Math.PI*2); c1.fill();
+    c1.beginPath(); c1.arc(x+40, 105, 6, 0, Math.PI*2); c1.fill();
+
+    document.getElementById("stats1").innerText = `Vaqt: ${t1.toFixed(1)} s | Masofa: ${(t1*v1).toFixed(1)} m | Tezlik: ${v1} m/s`;
+    if(running1) {
+        t1 += 0.05;
+        anim1 = requestAnimationFrame(draw1);
+    }
+}
+function start1() { if(!running1) { running1 = true; draw1(); } }
+function pause1() { running1 = false; }
+function reset1() { running1 = false; t1 = 0; draw1(); }
+function updateV1() { v1 = parseFloat(document.getElementById("v1").value); document.getElementById("v1_val").innerText = v1; draw1(); }
+draw1();
+
+// SIMULATION 2
+let c2 = document.getElementById("canvas2").getContext("2d");
+let t2 = 0, running2 = false, anim2;
+function draw2() {
+    c2.clearRect(0,0,700,150);
+    let vp = parseFloat(document.getElementById("v2_p").value);
+    let vo = parseFloat(document.getElementById("v2_o").value);
+    document.getElementById("v2_p_val").innerText = vp;
+    document.getElementById("v2_o_val").innerText = vo;
+
+    let px = (t2 * vp * 3) % 500;
+    let ox = px + 20 + (t2 * vo * 3);
+
+    // Train
+    c2.fillStyle = "#94a3b8";
+    c2.fillRect(px, 60, 180, 50);
+    // Person
+    c2.fillStyle = "#e11d48";
+    c2.beginPath(); c2.arc(ox, 50, 8, 0, Math.PI*2); c2.fill();
+
+    document.getElementById("stats2").innerText = `Poyezdga nisbatan: ${vo} m/s | Yerga nisbatan: ${vp + vo} m/s`;
+    if(running2) {
+        t2 += 0.05;
+        anim2 = requestAnimationFrame(draw2);
+    }
+}
+function start2() { if(!running2) { running2 = true; draw2(); } }
+function pause2() { running2 = false; }
+function reset2() { running2 = false; t2 = 0; draw2(); }
+function update2() { draw2(); }
+draw2();
+
+// SIMULATION 3
+let c3 = document.getElementById("canvas3").getContext("2d");
+let t3 = 0, running3 = false;
+function draw3() {
+    c3.clearRect(0,0,700,150);
+    let ref = document.getElementById("refBody").value;
+    let x_car = (t3 * 30) % 600;
+    
+    // Tree
+    c3.fillStyle = "#16a34a";
+    c3.fillRect(100, 40, 20, 60);
+
+    // Car 1
+    c3.fillStyle = "#0066cc";
+    c3.fillRect(x_car, 70, 50, 30);
+
+    let dist = (ref === "tree") ? Math.abs(x_car - 100) : 0;
+    document.getElementById("stats3").innerText = `Sanoq jismiga nisbatan masofa: ${dist.toFixed(0)} m`;
+
+    if(running3) {
+        t3 += 0.05;
+        requestAnimationFrame(draw3);
+    }
+}
+function start3() { if(!running3) { running3 = true; draw3(); } }
+function pause3() { running3 = false; }
+function reset3() { running3 = false; t3 = 0; draw3(); }
+draw3();
+
+// SIMULATION 4
+let c4 = document.getElementById("canvas4").getContext("2d");
+let t4 = 0, running4 = false;
+function draw4() {
+    c4.clearRect(0,0,700,150);
+    let x0 = parseFloat(document.getElementById("x0_4").value);
+    let v = parseFloat(document.getElementById("v_4").value);
+    document.getElementById("x0_4_val").innerText = x0;
+    document.getElementById("v_4_val").innerText = v;
+
+    let currentX = x0 + v * t4;
+
+    // Axis
+    c4.strokeStyle = "#000";
+    c4.beginPath(); c4.moveTo(20, 100); c4.lineTo(680, 100); c4.stroke();
+
+    // Object
+    c4.fillStyle = "#dc2626";
+    c4.beginPath(); c4.arc(20 + currentX * 3, 100, 10, 0, Math.PI*2); c4.fill();
+
+    document.getElementById("stats4").innerText = `Koordinata x = ${currentX.toFixed(1)} m | Vaqt t = ${t4.toFixed(1)} s`;
+
+    if(running4 && (20 + currentX * 3) < 680) {
+        t4 += 0.05;
+        requestAnimationFrame(draw4);
+    }
+}
+function start4() { if(!running4) { running4 = true; draw4(); } }
+function pause4() { running4 = false; }
+function reset4() { running4 = false; t4 = 0; draw4(); }
+draw4();
+</script>
+
+</body>
+</html>
