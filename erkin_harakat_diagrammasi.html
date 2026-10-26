@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jismlarning Erkin Harakat Diagrammasi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+        }
+        /* Canvas custom styling */
+        .canvas-container {
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+        }
+        /* Tooltip style */
+        .vector-tooltip {
+            position: absolute;
+            display: none;
+            pointer-events: none;
+            background: rgba(15, 23, 42, 0.9);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 50;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header Section -->
+    <header class="bg-gradient-to-r from-indigo-700 via-purple-700 to-blue-800 text-white shadow-lg p-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold tracking-tight">JISMLARNING ERKIN HARAKAT DIAGRAMMASI</h1>
+                <p class="text-xs md:text-sm text-indigo-200">Vektor kuchlar tizimi va Nyuton dinamikasi interaktiv simulyatsiyasi (7-9 sinflar)</p>
+            </div>
+            <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg border border-white/20 text-xs">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Fizik Modellar: <b>Nyuton Dinamikasi</b></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-7xl mx-auto w-full p-3 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 flex-grow">
+
+        <!-- LEFT PANEL: Modes & Controls (3 Cols) -->
+        <section class="lg:col-span-3 flex flex-col gap-5">
+            
+            <!-- Mode Selector -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    Harakat Rejimi
+                </h2>
+                <div class="flex flex-col gap-1.5" id="modeButtons">
+                    <button onclick="setMode(1)" id="mode-1" class="mode-btn text-left px-3 py-2 text-xs md:text-sm font-medium rounded-lg transition-all flex items-center justify-between border bg-indigo-50 border-indigo-200 text-indigo-700">
+                        <span>1. Gorizontal silliq tekislik</span>
+                        <span class="text-xs opacity-75">μ = 0</span>
+                    </button>
+                    <button onclick="setMode(2)" id="mode-2" class="mode-btn text-left px-3 py-2 text-xs md:text-sm font-medium rounded-lg transition-all flex items-center justify-between border border-transparent text-slate-600 hover:bg-slate-100">
+                        <span>2. Ishqalanishli gorizontal</span>
+                        <span class="text-xs opacity-75">μ > 0</span>
+                    </button>
+                    <button onclick="setMode(3)" id="mode-3" class="mode-btn text-left px-3 py-2 text-xs md:text-sm font-medium rounded-lg transition-all flex items-center justify-between border border-transparent text-slate-600 hover:bg-slate-100">
+                        <span>3. Qiya tekislik (Asosiy)</span>
+                        <span class="text-xs opacity-75">α, μ</span>
+                    </button>
+                    <button onclick="setMode(4)" id="mode-4" class="mode-btn text-left px-3 py-2 text-xs md:text-sm font-medium rounded-lg transition-all flex items-center justify-between border border-transparent text-slate-600 hover:bg-slate-100">
+                        <span>4. Vertikal erkin harakat</span>
+                        <span class="text-xs opacity-75">g</span>
+                    </button>
+                    <button onclick="setMode(5)" id="mode-5" class="mode-btn text-left px-3 py-2 text-xs md:text-sm font-medium rounded-lg transition-all flex items-center justify-between border border-transparent text-slate-600 hover:bg-slate-100">
+                        <span>5. Ipga osilgan jism</span>
+                        <span class="text-xs opacity-75">T, mg</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Parametrlar Panel (Sliders) -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex-grow flex flex-col justify-between">
+                <div>
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                        Parametrlar
+                    </h2>
+
+                    <!-- Slider: Massa -->
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs font-semibold text-slate-700 mb-1">
+                            <label for="massInput">Jism massasi (m):</label>
+                            <span class="text-indigo-600 font-bold" id="massVal">5.0 kg</span>
+                        </div>
+                        <input type="range" id="massInput" min="1" max="20" step="0.5" value="5" class="w-full accent-indigo-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- Slider: Burchak (Incline Angle) -->
+                    <div class="mb-4" id="angleContainer">
+                        <div class="flex justify-between text-xs font-semibold text-slate-700 mb-1">
+                            <label for="angleInput">Qiya tekislik burchagi (α):</label>
+                            <span class="text-indigo-600 font-bold" id="angleVal">30°</span>
+                        </div>
+                        <input type="range" id="angleInput" min="0" max="60" step="1" value="30" class="w-full accent-indigo-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- Slider: Ishqalanish -->
+                    <div class="mb-4" id="fricContainer">
+                        <div class="flex justify-between text-xs font-semibold text-slate-700 mb-1">
+                            <label for="fricInput">Ishqalanish koeffitsiyenti (μ):</label>
+                            <span class="text-indigo-600 font-bold" id="fricVal">0.20</span>
+                        </div>
+                        <input type="range" id="fricInput" min="0" max="1" step="0.05" value="0.2" class="w-full accent-indigo-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- Slider: Tashqi Kuch -->
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs font-semibold text-slate-700 mb-1">
+                            <label for="forceInput">Tashqi kuch (F):</label>
+                            <span class="text-red-600 font-bold" id="forceVal">20 N</span>
+                        </div>
+                        <input type="range" id="forceInput" min="0" max="100" step="1" value="20" class="w-full accent-red-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer">
+                    </div>
+
+                    <!-- Tashqi kuch yo'nalishi -->
+                    <div class="mb-4" id="forceDirContainer">
+                        <label class="text-xs font-semibold text-slate-700 mb-1 block">Tashqi kuch yo‘nalishi:</label>
+                        <select id="forceDirSelect" class="w-full text-xs p-2 bg-slate-100 border border-slate-300 rounded-lg text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="up">Tekislik bo‘ylab yuqoriga (↗)</option>
+                            <option value="down">Tekislik bo‘ylab pastga (↙)</option>
+                        </select>
+                    </div>
+
+                    <!-- Gravitatsiya -->
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600 flex justify-between items-center">
+                        <span>Erkin tushish tezlanishi (g):</span>
+                        <span class="font-bold text-slate-800">9.81 m/s²</span>
+                    </div>
+                </div>
+
+                <!-- Simulyatsiya tezligi -->
+                <div class="mt-4 pt-3 border-t border-slate-100">
+                    <div class="flex justify-between text-xs text-slate-500 mb-1">
+                        <span>Vaqt masshtabi (Speed):</span>
+                        <span id="speedVal" class="font-bold">1.0x</span>
+                    </div>
+                    <input type="range" id="speedInput" min="0.2" max="2.0" step="0.1" value="1.0" class="w-full accent-slate-600 h-1 bg-slate-200 rounded">
+                </div>
+            </div>
+
+        </section>
+
+        <!-- CENTER PANEL: Interactive Canvas & Controls (6 Cols) -->
+        <section class="lg:col-span-6 flex flex-col gap-4">
+            
+            <!-- Canvas Simulation Box -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-3 flex flex-col items-center justify-between relative overflow-hidden">
+                
+                <!-- Vector Tooltip Container -->
+                <div id="vectorTooltip" class="vector-tooltip">
+                    <div id="tooltipTitle" class="font-bold border-b border-white/20 pb-1 mb-1 text-xs"></div>
+                    <div id="tooltipBody" class="text-[11px] leading-relaxed"></div>
+                </div>
+
+                <!-- Status Badge -->
+                <div class="w-full flex justify-between items-center mb-2 px-1 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold text-slate-700">Holat:</span>
+                        <span id="stateBadge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">Tinch holatda</span>
+                    </div>
+                    <div class="text-slate-400 text-[11px]">
+                        * Vektor ustiga bosib uning ma'lumotini ko'ring
+                    </div>
+                </div>
+
+                <!-- Canvas -->
+                <div class="canvas-container w-full h-[360px] bg-slate-900 rounded-lg overflow-hidden border border-slate-800 relative cursor-crosshair">
+                    <canvas id="simCanvas" class="w-full h-full"></canvas>
+                </div>
+
+                <!-- Simulation Control Buttons -->
+                <div class="w-full flex flex-wrap items-center justify-center gap-2 mt-3">
+                    <button onclick="startSim()" title="Boshlash" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-xs flex items-center gap-1 shadow-sm transition">
+                        ▶ Boshlash
+                    </button>
+                    <button onclick="pauseSim()" title="To'xtatish" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-semibold text-xs flex items-center gap-1 shadow-sm transition">
+                        Ⅱ To‘xtatish
+                    </button>
+                    <button onclick="resetSim()" title="Qayta boshlash" class="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-lg font-semibold text-xs flex items-center gap-1 shadow-sm transition">
+                        ↻ Qayta
+                    </button>
+                    <div class="h-4 w-px bg-slate-300 mx-1"></div>
+                    <button onclick="toggleVectors()" id="vecToggleBtn" class="px-3 py-2 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded-lg font-semibold text-xs transition">
+                        📐 Kuchlar: YONIQ
+                    </button>
+                    <button onclick="toggleGraphModal()" class="px-3 py-2 bg-purple-100 text-purple-700 hover:bg-purple-200 rounded-lg font-semibold text-xs flex items-center gap-1 transition">
+                        📊 Grafik
+                    </button>
+                </div>
+            </div>
+
+            <!-- Live Dynamic Results -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                    <div class="text-[11px] text-slate-500 font-medium">Natijaviy kuch (ΣF)</div>
+                    <div id="resNetForce" class="text-base font-bold text-indigo-600">0.00 N</div>
+                </div>
+                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                    <div class="text-[11px] text-slate-500 font-medium">Tezlanish (a)</div>
+                    <div id="resAcc" class="text-base font-bold text-emerald-600">0.00 m/s²</div>
+                </div>
+                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                    <div class="text-[11px] text-slate-500 font-medium">Tezlik (v)</div>
+                    <div id="resVel" class="text-base font-bold text-blue-600">0.00 m/s</div>
+                </div>
+                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                    <div class="text-[11px] text-slate-500 font-medium">Bosib o‘tilgan yo‘l (x)</div>
+                    <div id="resPos" class="text-base font-bold text-purple-600">0.00 m</div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- RIGHT PANEL: Calculated Forces & Equations (3 Cols) -->
+        <section class="lg:col-span-3 flex flex-col gap-5">
+            
+            <!-- Formulas & Realtime Calculations -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m-6 4h6m-6 4h6M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Kuchlar tahlili
+                </h2>
+
+                <div class="space-y-2 text-xs">
+                    <!-- Og'irlik kuchi -->
+                    <div class="p-2 rounded-lg bg-emerald-50 border border-emerald-100 flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-emerald-800">P = mg</span>
+                            <div class="text-[10px] text-emerald-600">Og‘irlik kuchi</div>
+                        </div>
+                        <span id="calcP" class="font-bold text-emerald-700">49.05 N</span>
+                    </div>
+
+                    <!-- Normal Reaksiya -->
+                    <div class="p-2 rounded-lg bg-blue-50 border border-blue-100 flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-blue-800">N = mg·cos(α)</span>
+                            <div class="text-[10px] text-blue-600">Normal reaksiya kuchi</div>
+                        </div>
+                        <span id="calcN" class="font-bold text-blue-700">42.48 N</span>
+                    </div>
+
+                    <!-- Parallel og'irlik proyeksiyasi -->
+                    <div class="p-2 rounded-lg bg-slate-100 border border-slate-200 flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-slate-700">P∥ = mg·sin(α)</span>
+                            <div class="text-[10px] text-slate-500">Tekislik bo‘ylab og‘irlik</div>
+                        </div>
+                        <span id="calcPpar" class="font-bold text-slate-700">24.53 N</span>
+                    </div>
+
+                    <!-- Perpendikulyar og'irlik proyeksiyasi -->
+                    <div class="p-2 rounded-lg bg-slate-100 border border-slate-200 flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-slate-700">P⊥ = mg·cos(α)</span>
+                            <div class="text-[10px] text-slate-500">Tekislikka tik og‘irlik</div>
+                        </div>
+                        <span id="calcPperp" class="font-bold text-slate-700">42.48 N</span>
+                    </div>
+
+                    <!-- Ishqalanish kuchi -->
+                    <div class="p-2 rounded-lg bg-purple-50 border border-purple-100 flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-purple-800">F_ishq = μ·N</span>
+                            <div class="text-[10px] text-purple-600">Ishqalanish kuchi</div>
+                        </div>
+                        <span id="calcFric" class="font-bold text-purple-700">8.50 N</span>
+                    </div>
+
+                    <!-- Tashqi kuch -->
+                    <div class="p-2 rounded-lg bg-red-50 border border-red-100 flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-red-800">F_tashqi</span>
+                            <div class="text-[10px] text-red-600">Qo‘llanilgan kuch</div>
+                        </div>
+                        <span id="calcFext" class="font-bold text-red-700">20.00 N</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Newton Equation Card -->
+            <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white p-4 rounded-xl shadow-sm text-xs space-y-2">
+                <div class="text-indigo-300 font-semibold uppercase text-[10px] tracking-wider">Harakat Tenglamasi</div>
+                <div class="font-mono bg-white/10 p-2 rounded text-[11px] leading-relaxed" id="eqDisplay">
+                    a = (F - P∥ - Fishq) / m
+                </div>
+                <p class="text-[10px] text-slate-300">
+                    Nyutonning II-qonuniga ko‘ra tezlanish jismga ta’sir qiluvchi barcha kuchlarning teng ta’sir etuvchisiga to‘g‘ri mutanosibdir.
+                </p>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- TABBED BOTTOM SECTIONS: Test & Practical Experiment -->
+    <section class="max-w-7xl mx-auto w-full p-3 md:p-6 pt-0 space-y-6">
+        
+        <!-- Interactive Quiz Section -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-3 mb-4 gap-2">
+                <div>
+                    <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        🧠 Bilimingizni sinab ko‘ring (Interaktiv Test)
+                    </h2>
+                    <p class="text-xs text-slate-500">Mavzu bo‘yicha 10 ta interaktiv savol va tushuntirishlar</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-semibold text-slate-600">Ball: <b id="quizScore" class="text-indigo-600 text-sm">0 / 10</b></span>
+                    <button onclick="resetQuiz()" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs rounded-lg font-medium transition">Qayta yechish</button>
+                </div>
+            </div>
+
+            <!-- Quiz Container -->
+            <div id="quizContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Test Cards dynamically rendered here -->
+            </div>
+        </div>
+
+        <!-- Practical Experiment Data Table -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-3 mb-4 gap-2">
+                <div>
+                    <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        📝 Mustaqil Tajriba Natijalari Jadvali
+                    </h2>
+                    <p class="text-xs text-slate-500">Parametrlarni o‘zgartirib tajriba o‘tkazing va natijalarni saqlang</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="addExpRecord()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs rounded-lg font-semibold shadow-sm transition flex items-center gap-1">
+                        ➕ Jadvalga qo‘shish
+                    </button>
+                    <button onclick="clearExpTable()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs rounded-lg font-semibold transition">
+                        🗑 Tozalash
+                    </button>
+                    <button onclick="exportCSV()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-lg font-semibold shadow-sm transition flex items-center gap-1">
+                        📥 CSV Yuklab olish
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 border-b border-slate-200 text-slate-700 font-semibold">
+                            <th class="p-2.5">Tajriba №</th>
+                            <th class="p-2.5">Harakat Rejimi</th>
+                            <th class="p-2.5">Massa m (kg)</th>
+                            <th class="p-2.5">Burchak α (°)</th>
+                            <th class="p-2.5">Ishqalanish μ</th>
+                            <th class="p-2.5">Tashqi Kuch F (N)</th>
+                            <th class="p-2.5">Natijaviy Kuch ΣF (N)</th>
+                            <th class="p-2.5">Tezlanish a (m/s²)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expTableBody" class="divide-y divide-slate-100">
+                        <!-- Table rows populated dynamically -->
+                        <tr id="emptyRow">
+                            <td colspan="8" class="text-center p-4 text-slate-400 italic">Hali tajriba natijalari saqlanmadi. Yuqoridagi "Jadvalga qo‘shish" tugmasini bosing.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- GRAPH MODAL OVERLAY -->
+    <div id="graphModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-slate-200 p-5 flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                    📊 Real-Vaqt Analitik Grafiklar
+                </h3>
+                <button onclick="toggleGraphModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg">&times;</button>
+            </div>
+
+            <!-- Graph Type Selector Buttons -->
+            <div class="flex flex-wrap gap-2 text-xs">
+                <button onclick="setGraphType('v')" id="btn-g-v" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-medium">Tezlik: v(t)</button>
+                <button onclick="setGraphType('a')" id="btn-g-a" class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium">Tezlanish: a(t)</button>
+                <button onclick="setGraphType('x')" id="btn-g-x" class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium">Koordinata: x(t)</button>
+                <button onclick="setGraphType('f')" id="btn-g-f" class="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium">Natijaviy Kuch: F(t)</button>
+            </div>
+
+            <!-- Graph Canvas -->
+            <div class="w-full h-64 bg-slate-900 rounded-xl overflow-hidden relative">
+                <canvas id="graphCanvas" class="w-full h-full"></canvas>
+            </div>
+
+            <div class="flex justify-between items-center text-xs text-slate-500 pt-2 border-t border-slate-100">
+                <span>Vaqt o‘qi: t (soniya)</span>
+                <button onclick="clearGraphData()" class="px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-md transition font-medium">Grafikni tozalash</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-4 text-center mt-auto border-t border-slate-800">
+        <p>© 2026 Maktab Fizika Dasturi — Interaktiv Erkin Harakat Diagrammasi Simulyatsiyasi</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC & PHYSICS ENGINE -->
+    <script>
+        /* =========================================================
+         *  GLOBAL STATE & PHYSICS VARIABLES
+         * ========================================================= */
+        const g = 9.81; // m/s^2
+
+        // Simulation parameters
+        let mode = 3; // 1: Smooth horiz, 2: Friction horiz, 3: Incline (Default), 4: Free fall, 5: Pendulum
+        let mass = 5.0; // kg
+        let angleDeg = 30; // degrees
+        let mu = 0.20; // friction coefficient
+        let F_ext = 20.0; // N
+        let F_dir = 'up'; // 'up' or 'down'
+
+        // Dynamic State
+        let isRunning = false;
+        let time = 0; // s
+        let pos = 0; // m
+        let vel = 0; // m/s
+        let acc = 0; // m/s^2
+        let timeScale = 1.0;
+        let showVectors = true;
+
+        // Computed forces
+        let P = 0;
+        let N = 0;
+        let P_par = 0;
+        let P_perp = 0;
+        let F_fric = 0;
+        let F_net = 0;
+
+        // Graph data history
+        let graphHistory = []; // {t, v, a, x, f}
+        let currentGraphType = 'v';
+
+        // Interactive vector clicking hitboxes
+        let vectorHitboxes = [];
+
+        // UI Element References
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const graphCanvas = document.getElementById('graphCanvas');
+        const gCtx = graphCanvas.getContext('2d');
+        const tooltip = document.getElementById('vectorTooltip');
+
+        /* =========================================================
+         *  INITIALIZATION & EVENT LISTENERS
+         * ========================================================= */
+        window.onload = function() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            setupInputListeners();
+            initQuiz();
+            calculatePhysics();
+            requestAnimationFrame(simLoop);
+        };
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+
+            const gContainer = graphCanvas.parentElement;
+            graphCanvas.width = gContainer.clientWidth;
+            graphCanvas.height = gContainer.clientHeight;
+        }
+
+        function setupInputListeners() {
+            document.getElementById('massInput').addEventListener('input', (e) => {
+                mass = parseFloat(e.target.value);
+                document.getElementById('massVal').innerText = mass.toFixed(1) + ' kg';
+                calculatePhysics();
+            });
+
+            document.getElementById('angleInput').addEventListener('input', (e) => {
+                angleDeg = parseFloat(e.target.value);
+                document.getElementById('angleVal').innerText = angleDeg + '°';
+                calculatePhysics();
+            });
+
+            document.getElementById('fricInput').addEventListener('input', (e) => {
+                mu = parseFloat(e.target.value);
+                document.getElementById('fricVal').innerText = mu.toFixed(2);
+                calculatePhysics();
+            });
+
+            document.getElementById('forceInput').addEventListener('input', (e) => {
+                F_ext = parseFloat(e.target.value);
+                document.getElementById('forceVal').innerText = F_ext.toFixed(0) + ' N';
+                calculatePhysics();
+            });
+
+            document.getElementById('forceDirSelect').addEventListener('change', (e) => {
+                F_dir = e.target.value;
+                calculatePhysics();
+            });
+
+            document.getElementById('speedInput').addEventListener('input', (e) => {
+                timeScale = parseFloat(e.target.value);
+                document.getElementById('speedVal').innerText = timeScale.toFixed(1) + 'x';
+            });
+
+            // Canvas Vector Tooltip Hover / Click Event
+            canvas.addEventListener('mousemove', handleCanvasHover);
+            canvas.addEventListener('click', handleCanvasClick);
+        }
+
+        /* =========================================================
+         *  MODE HANDLING
+         * ========================================================= */
+        function setMode(newMode) {
+            mode = newMode;
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.getElementById(`mode-${i}`);
+                if (i === mode) {
+                    btn.className = "mode-btn text-left px-3 py-2 text-xs md:text-sm font-medium rounded-lg transition-all flex items-center justify-between border bg-indigo-50 border-indigo-200 text-indigo-700 font-bold";
+                } else {
+                    btn.className = "mode-btn text-left px-3 py-2 text-xs md:text-sm font-medium rounded-lg transition-all flex items-center justify-between border border-transparent text-slate-600 hover:bg-slate-100";
+                }
+            }
+
+            // Adjust controls visibility based on mode
+            const angleCont = document.getElementById('angleContainer');
+            const fricCont = document.getElementById('fricContainer');
+            const forceDirCont = document.getElementById('forceDirContainer');
+
+            if (mode === 1) { // Horizontal Smooth
+                angleCont.style.display = 'none';
+                fricCont.style.display = 'none';
+                forceDirCont.style.display = 'block';
+                angleDeg = 0;
+                mu = 0;
+            } else if (mode === 2) { // Horizontal Friction
+                angleCont.style.display = 'none';
+                fricCont.style.display = 'block';
+                forceDirCont.style.display = 'block';
+                angleDeg = 0;
+            } else if (mode === 3) { // Incline
+                angleCont.style.display = 'block';
+                fricCont.style.display = 'block';
+                forceDirCont.style.display = 'block';
+            } else if (mode === 4) { // Free Fall / Vertical
+                angleCont.style.display = 'none';
+                fricCont.style.display = 'none';
+                forceDirCont.style.display = 'block';
+                angleDeg = 90;
+                mu = 0;
+            } else if (mode === 5) { // Pendulum / Hanging
+                angleCont.style.display = 'none';
+                fricCont.style.display = 'none';
+                forceDirCont.style.display = 'none';
+            }
+
+            resetSim();
+        }
+
+        /* =========================================================
+         *  PHYSICS ENGINE COMPUTATIONS
+         * ========================================================= */
+        function calculatePhysics() {
+            const alpha = angleDeg * (Math.PI / 180);
+
+            P = mass * g; // Weight
+
+            if (mode === 4) {
+                // Vertical motion
+                P_perp = 0;
+                P_par = P;
+                N = 0;
+                let F_push = (F_dir === 'up') ? F_ext : -F_ext;
+                F_net = F_push - P; // UP positive
+                F_fric = 0;
+            } 
+            else if (mode === 5) {
+                // Hanging string
+                N = 0;
+                P_par = 0;
+                P_perp = P;
+                F_fric = 0;
+                F_net = 0; // Stationary hanging equilibrium
+            } 
+            else {
+                // Incline or Horizontal
+                P_par = P * Math.sin(alpha);
+                P_perp = P * Math.cos(alpha);
+                N = P_perp; // Normal force equals perpendicular gravity component
+
+                let F_applied = (F_dir === 'up') ? F_ext : -F_ext;
+                
+                // Net driving force along plane before friction
+                // Upward plane is positive direction
+                let F_drive = F_applied - P_par; 
+                let maxStaticFric = mu * N;
+
+                if (Math.abs(vel) < 0.001) {
+                    // Object is stationary
+                    if (Math.abs(F_drive) <= maxStaticFric) {
+                        // Static friction balances the drive force completely
+                        F_fric = Math.abs(F_drive);
+                        F_net = 0;
+                    } else {
+                        // Dynamic sliding begins
+                        F_fric = maxStaticFric;
+                        F_net = F_drive - Math.sign(F_drive) * F_fric;
+                    }
+                } else {
+                    // Object is moving, kinetic friction opposes motion direction
+                    F_fric = maxStaticFric;
+                    F_net = F_drive - Math.sign(vel) * F_fric;
+                }
+            }
+
+            acc = F_net / mass;
+
+            // Update UI Displays
+            document.getElementById('calcP').innerText = P.toFixed(2) + ' N';
+            document.getElementById('calcN').innerText = N.toFixed(2) + ' N';
+            document.getElementById('calcPpar').innerText = P_par.toFixed(2) + ' N';
+            document.getElementById('calcPperp').innerText = P_perp.toFixed(2) + ' N';
+            document.getElementById('calcFric').innerText = F_fric.toFixed(2) + ' N';
+            document.getElementById('calcFext').innerText = F_ext.toFixed(2) + ' N';
+
+            document.getElementById('resNetForce').innerText = F_net.toFixed(2) + ' N';
+            document.getElementById('resAcc').innerText = acc.toFixed(2) + ' m/s²';
+
+            // State Badge Text
+            const badge = document.getElementById('stateBadge');
+            if (Math.abs(acc) < 0.001 && Math.abs(vel) < 0.001) {
+                badge.innerText = "Tinch (Muvozanatda)";
+                badge.className = "px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800";
+            } else if (acc > 0) {
+                badge.innerText = "Tezlanuvchan harakat (↗)";
+                badge.className = "px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800";
+            } else {
+                badge.innerText = "Sekinlashuvchan / Teskari (↙)";
+                badge.className = "px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800";
+            }
+
+            // Update LaTeX / Equation Formula
+            updateEquationDisplay();
+        }
+
+        function updateEquationDisplay() {
+            const eqBox = document.getElementById('eqDisplay');
+            if (mode === 3) {
+                eqBox.innerHTML = `a = (F_tashqi - mg·sin(α) - μ·mg·cos(α)) / m<br>` +
+                                 `a = (${F_ext} - ${P_par.toFixed(1)} - ${F_fric.toFixed(1)}) / ${mass} = <b>${acc.toFixed(2)} m/s²</b>`;
+            } else if (mode === 1 || mode === 2) {
+                eqBox.innerHTML = `a = (F_tashqi - F_ishq) / m<br>` +
+                                 `a = (${F_ext} - ${F_fric.toFixed(1)}) / ${mass} = <b>${acc.toFixed(2)} m/s²</b>`;
+            } else if (mode === 4) {
+                eqBox.innerHTML = `a = (F_tashqi - mg) / m<br>` +
+                                 `a = (${F_ext} - ${P.toFixed(1)}) / ${mass} = <b>${acc.toFixed(2)} m/s²</b>`;
+            } else {
+                eqBox.innerHTML = `T = mg = ${P.toFixed(2)} N (Ip tarangligi)<br>ΣF = 0 N (Muvozanat)`;
+            }
+        }
+
+        /* =========================================================
+         *  SIMULATION LOOP & ANIMATION ENGINE
+         * ========================================================= */
+        let lastTimestamp = 0;
+
+        function simLoop(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            let dt = (timestamp - lastTimestamp) / 1000;
+            lastTimestamp = timestamp;
+
+            // Cap dt to prevent frame lag jump
+            if (dt > 0.1) dt = 0.1;
+
+            if (isRunning) {
+                let effectiveDt = dt * timeScale;
+                time += effectiveDt;
+
+                // Physics Numerical Integration (Euler-Cromer)
+                calculatePhysics();
+                vel += acc * effectiveDt;
+                pos += vel * effectiveDt;
+
+                // Border limits check to stop runaway animation
+                if (Math.abs(pos) > 50) {
+                    isRunning = false;
+                }
+
+                // Record history for graph rendering
+                graphHistory.push({
+                    t: time,
+                    v: vel,
+                    a: acc,
+                    x: pos,
+                    f: F_net
+                });
+                if (graphHistory.length > 500) graphHistory.shift();
+
+                // Live dynamic display update
+                document.getElementById('resVel').innerText = vel.toFixed(2) + ' m/s';
+                document.getElementById('resPos').innerText = pos.toFixed(2) + ' m';
+            }
+
+            renderCanvas();
+            renderGraphModal();
+
+            requestAnimationFrame(simLoop);
+        }
+
+        function startSim() { isRunning = true; }
+        function pauseSim() { isRunning = false; }
+        function resetSim() {
+            isRunning = false;
+            time = 0;
+            pos = 0;
+            vel = 0;
+            acc = 0;
+            graphHistory = [];
+            calculatePhysics();
+            document.getElementById('resVel').innerText = '0.00 m/s';
+            document.getElementById('resPos').innerText = '0.00 m';
+        }
+        function toggleVectors() {
+            showVectors = !showVectors;
+            document.getElementById('vecToggleBtn').innerText = showVectors ? "📐 Kuchlar: YONIQ" : "📐 Kuchlar: O‘CHIQ";
+        }
+
+        /* =========================================================
+         *  CANVAS RENDERING ENGINE (SVG-style Dynamic Vectors)
+         * ========================================================= */
+        function renderCanvas() {
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+            vectorHitboxes = []; // Reset hitboxes for user clicks
+
+            // Background Grid & Environment
+            drawGrid(w, h);
+
+            // Center of coordinate system for scene
+            const cx = w * 0.45;
+            const cy = h * 0.65;
+            const alpha = angleDeg * (Math.PI / 180);
+
+            if (mode === 4) {
+                // Vertical Falling/Otish Rendering
+                drawVerticalScene(cx, cy);
+            } else if (mode === 5) {
+                // Hanging Rope Scene
+                drawHangingScene(w / 2, h * 0.2);
+            } else {
+                // Incline / Horizontal Surface Scene
+                drawInclineScene(cx, cy, alpha);
+            }
+        }
+
+        function drawGrid(w, h) {
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            const step = 30;
+            for (let x = 0; x < w; x += step) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, h);
+                ctx.stroke();
+            }
+            for (let y = 0; y < h; y += step) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(w, y);
+                ctx.stroke();
+            }
+        }
+
+        function drawInclineScene(cx, cy, alpha) {
+            const scale = 15; // px per meter
+            const planeLength = 600;
+
+            // Compute Incline Line Coordinates
+            const x1 = cx - planeLength * 0.5 * Math.cos(alpha);
+            const y1 = cy + planeLength * 0.5 * Math.sin(alpha);
+            const x2 = cx + planeLength * 0.5 * Math.cos(alpha);
+            const y2 = cy - planeLength * 0.5 * Math.sin(alpha);
+
+            // Draw Ground Base
+            ctx.fillStyle = '#334155';
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y1); // Horizontal base
+            ctx.lineTo(x2, y2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw Angle Arc
+            if (angleDeg > 0) {
+                ctx.beginPath();
+                ctx.arc(x1, y1, 40, 0, -alpha, true);
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.fillStyle = '#f59e0b';
+                ctx.font = '12px Inter';
+                ctx.fillText(`α = ${angleDeg}°`, x1 + 45, y1 - 10);
+            }
+
+            // Calculate Box Center Position along plane
+            let currentOffset = pos * scale;
+            // Wrap around canvas view if moves out of bound
+            currentOffset = ((currentOffset + 200) % 400) - 200;
+
+            const boxCenterX = cx + currentOffset * Math.cos(alpha);
+            const boxCenterY = cy - currentOffset * Math.sin(alpha);
+
+            // Draw Wooden Block Box
+            const boxW = 50;
+            const boxH = 35;
+
+            ctx.save();
+            ctx.translate(boxCenterX, boxCenterY);
+            ctx.rotate(-alpha);
+
+            // Box Body
+            ctx.fillStyle = '#d97706'; // Amber wood style
+            ctx.strokeStyle = '#78350f';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.roundRect(-boxW / 2, -boxH, boxW, boxH, 6);
+            ctx.fill();
+            ctx.stroke();
+
+            // Box Texture Lines
+            ctx.strokeStyle = '#b45309';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(-boxW / 4, -boxH + 5);
+            ctx.lineTo(-boxW / 4, -5);
+            ctx.moveTo(boxW / 4, -boxH + 5);
+            ctx.lineTo(boxW / 4, -5);
+            ctx.stroke();
+
+            // Mass label inside box
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 11px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${mass} kg`, 0, -boxH / 2 + 4);
+
+            ctx.restore();
+
+            // Center of mass for vector origins
+            const ox = boxCenterX - (boxH / 2) * Math.sin(alpha);
+            const oy = boxCenterY - (boxH / 2) * Math.cos(alpha);
+
+            // Draw Forces Diagram Vectors
+            if (showVectors) {
+                const vectorScale = 1.5; // pixel per Newton
+
+                // 1. Og'irlik kuchi P (Yashil - Vertikal pastga)
+                const P_len = P * vectorScale;
+                drawArrow(ox, oy, ox, oy + P_len, '#10b981', `P = ${P.toFixed(1)}N`, 'Og‘irlik kuchi (P = mg)');
+
+                // 2. Normal Reaksiya N (Ko'k - Perpendikulyar tekislikdan yuqoriga)
+                const N_len = N * vectorScale;
+                const Nx = ox - N_len * Math.sin(alpha);
+                const Ny = oy - N_len * Math.cos(alpha);
+                drawArrow(ox, oy, Nx, Ny, '#3b82f6', `N = ${N.toFixed(1)}N`, 'Normal reaksiya kuchi (N)');
+
+                // 3. Tashqi Kuch F (Qizil - Tekislik bo'ylab)
+                if (F_ext > 0) {
+                    const F_len = F_ext * vectorScale;
+                    const dirMult = (F_dir === 'up') ? 1 : -1;
+                    const Fx = ox + dirMult * F_len * Math.cos(alpha);
+                    const Fy = oy - dirMult * F_len * Math.sin(alpha);
+                    drawArrow(ox, oy, Fx, Fy, '#ef4444', `F = ${F_ext.toFixed(1)}N`, 'Tashqi kuch (F)');
+                }
+
+                // 4. Ishqalanish kuchi F_ishq (Binafsha)
+                if (F_fric > 0) {
+                    const Fric_len = F_fric * vectorScale;
+                    // Opposes driving force or motion velocity direction
+                    let fricDir = (vel !== 0) ? -Math.sign(vel) : -Math.sign((F_dir === 'up' ? F_ext : -F_ext) - P_par);
+                    if (fricDir === 0) fricDir = -1;
+
+                    const FricX = ox + fricDir * Fric_len * Math.cos(alpha);
+                    const FricY = oy - fricDir * Fric_len * Math.sin(alpha);
+                    drawArrow(ox, oy, FricX, FricY, '#a855f7', `F_ishq = ${F_fric.toFixed(1)}N`, 'Ishqalanish kuchi (F_ishq)');
+                }
+
+                // 5. Punktir Proyeksiyalar (Og'irlik kuchi tarkibiy qismlari)
+                if (angleDeg > 0) {
+                    // P_perp (Tekislikka tik pastga)
+                    const Pperp_len = P_perp * vectorScale;
+                    const Pperpx = ox + Pperp_len * Math.sin(alpha);
+                    const Pperpy = oy + Pperp_len * Math.cos(alpha);
+                    drawDashedLine(ox, oy, Pperpx, Pperpy, '#94a3b8');
+
+                    // P_par (Tekislik bo'ylab pastga)
+                    const Ppar_len = P_par * vectorScale;
+                    const Pparx = ox - Ppar_len * Math.cos(alpha);
+                    const Ppary = oy + Ppar_len * Math.sin(alpha);
+                    drawDashedLine(ox, oy, Pparx, Ppary, '#94a3b8');
+
+                    // Vector labels for components
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.font = '10px Inter';
+                    ctx.fillText(`P⊥`, Pperpx + 5, Pperpy);
+                    ctx.fillText(`P∥`, Pparx - 10, Ppary + 10);
+                }
+            }
+        }
+
+        function drawVerticalScene(cx, cy) {
+            const scale = 10;
+            const py = cy - (pos * scale) % 200;
+
+            // Draw Guide line
+            ctx.strokeStyle = '#334155';
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(cx, 40);
+            ctx.lineTo(cx, canvas.height - 40);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw Ball
+            const radius = 22;
+            ctx.fillStyle = '#38bdf8';
+            ctx.strokeStyle = '#0284c7';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(cx, py, radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 11px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${mass} kg`, cx, py + 4);
+
+            if (showVectors) {
+                const vectorScale = 1.5;
+                // P Gravity (Down)
+                drawArrow(cx, py, cx, py + P * vectorScale, '#10b981', `P = ${P.toFixed(1)}N`, 'Og‘irlik kuchi (P = mg)');
+
+                // F External (Up or Down)
+                if (F_ext > 0) {
+                    const dirMult = (F_dir === 'up') ? -1 : 1;
+                    drawArrow(cx, py, cx, py + dirMult * F_ext * vectorScale, '#ef4444', `F = ${F_ext.toFixed(1)}N`, 'Tashqi kuch (F)');
+                }
+            }
+        }
+
+        function drawHangingScene(cx, cy) {
+            const ropeLength = 140;
+            const ballY = cy + ropeLength;
+
+            // Ceiling Line
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(cx - 60, cy);
+            ctx.lineTo(cx + 60, cy);
+            ctx.stroke();
+
+            // Rope
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx, ballY);
+            ctx.stroke();
+
+            // Ball
+            const radius = 24;
+            ctx.fillStyle = '#ec4899';
+            ctx.strokeStyle = '#be185d';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(cx, ballY, radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 11px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${mass} kg`, cx, ballY + 4);
+
+            if (showVectors) {
+                const vectorScale = 1.5;
+                // Tension T (Upwards)
+                drawArrow(cx, ballY, cx, ballY - P * vectorScale, '#3b82f6', `T = ${P.toFixed(1)}N`, 'Ip taranglik kuchi (T)');
+                // Gravity P (Downwards)
+                drawArrow(cx, ballY, cx, ballY + P * vectorScale, '#10b981', `P = ${P.toFixed(1)}N`, 'Og‘irlik kuchi (P = mg)');
+            }
+        }
+
+        /* =========================================================
+         *  VECTOR ARROW & DASHED LINE HELPER UTILITIES
+         * ========================================================= */
+        function drawArrow(x1, y1, x2, y2, color, label, infoText) {
+            const headlen = 10; // Arrowhead length
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const angle = Math.atan2(dy, dx);
+
+            // Save Hitbox for Interactive Clicking
+            vectorHitboxes.push({
+                x1, y1, x2, y2,
+                label, infoText, color
+            });
+
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 3;
+
+            // Draw Main Line
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+
+            // Draw Arrow Head
+            ctx.beginPath();
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6), y2 - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(x2 - headlen * Math.cos(angle + Math.PI / 6), y2 - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+
+            // Label Text next to vector head
+            ctx.font = 'bold 11px Inter';
+            ctx.fillText(label, x2 + 8 * Math.cos(angle), y2 + 8 * Math.sin(angle));
+        }
+
+        function drawDashedLine(x1, y1, x2, y2, color) {
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        /* =========================================================
+         *  INTERACTIVE VECTOR HOVER & CLICK HANDLERS
+         * ========================================================= */
+        function handleCanvasHover(e) {
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+
+            let hovered = false;
+            for (let v of vectorHitboxes) {
+                if (isPointNearSegment(mx, my, v.x1, v.y1, v.x2, v.y2, 10)) {
+                    canvas.style.cursor = 'pointer';
+                    hovered = true;
+                    break;
+                }
+            }
+            if (!hovered) {
+                canvas.style.cursor = 'crosshair';
+            }
+        }
+
+        function handleCanvasClick(e) {
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+
+            for (let v of vectorHitboxes) {
+                if (isPointNearSegment(mx, my, v.x1, v.y1, v.x2, v.y2, 10)) {
+                    showVectorTooltip(e.clientX, e.clientY, v.label, v.infoText);
+                    return;
+                }
+            }
+            tooltip.style.display = 'none';
+        }
+
+        function isPointNearSegment(px, py, x1, y1, x2, y2, threshold) {
+            const L2 = (x2 - x1) ** 2 + (y2 - y1) ** 2;
+            if (L2 === 0) return Math.hypot(px - x1, py - y1) < threshold;
+            let t = ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / L2;
+            t = Math.max(0, Math.min(1, t));
+            const projX = x1 + t * (x2 - x1);
+            const projY = y1 + t * (y2 - y1);
+            return Math.hypot(px - projX, py - projY) < threshold;
+        }
+
+        function showVectorTooltip(clientX, clientY, title, body) {
+            const rect = canvas.getBoundingClientRect();
+            tooltip.style.left = (clientX - rect.left + 10) + 'px';
+            tooltip.style.top = (clientY - rect.top - 40) + 'px';
+            document.getElementById('tooltipTitle').innerText = title;
+            document.getElementById('tooltipBody').innerText = body;
+            tooltip.style.display = 'block';
+
+            setTimeout(() => {
+                tooltip.style.display = 'none';
+            }, 4000);
+        }
+
+        /* =========================================================
+         *  GRAPH MODAL CANVAS RENDERER
+         * ========================================================= */
+        function toggleGraphModal() {
+            const modal = document.getElementById('graphModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function setGraphType(type) {
+            currentGraphType = type;
+            const btns = ['v', 'a', 'x', 'f'];
+            btns.forEach(b => {
+                const el = document.getElementById(`btn-g-${b}`);
+                if (b === type) {
+                    el.className = "px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-medium";
+                } else {
+                    el.className = "px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 font-medium";
+                }
+            });
+        }
+
+        function clearGraphData() {
+            graphHistory = [];
+        }
+
+        function renderGraphModal() {
+            if (document.getElementById('graphModal').classList.contains('hidden')) return;
+
+            const w = graphCanvas.width;
+            const h = graphCanvas.height;
+            gCtx.clearRect(0, 0, w, h);
+
+            // Draw Background & Axes
+            gCtx.strokeStyle = '#334155';
+            gCtx.lineWidth = 1;
+            gCtx.beginPath();
+            gCtx.moveTo(40, 20);
+            gCtx.lineTo(40, h - 30);
+            gCtx.lineTo(w - 20, h - 30);
+            gCtx.stroke();
+
+            if (graphHistory.length < 2) {
+                gCtx.fillStyle = '#94a3b8';
+                gCtx.font = '12px Inter';
+                gCtx.fillText("Grafik chizish uchun simulyatsiyani boshlang (▶ Boshlash)", w / 2 - 140, h / 2);
+                return;
+            }
+
+            // Extract selected series
+            const values = graphHistory.map(item => item[currentGraphType]);
+            const maxVal = Math.max(...values, 1);
+            const minVal = Math.min(...values, -1);
+            const range = (maxVal - minVal) || 1;
+
+            // Plot line
+            gCtx.strokeStyle = currentGraphType === 'v' ? '#6366f1' : currentGraphType === 'a' ? '#10b981' : currentGraphType === 'x' ? '#a855f7' : '#ef4444';
+            gCtx.lineWidth = 2.5;
+            gCtx.beginPath();
+
+            const plotW = w - 60;
+            const plotH = h - 50;
+
+            graphHistory.forEach((pt, i) => {
+                const x = 40 + (i / (graphHistory.length - 1)) * plotW;
+                const val = pt[currentGraphType];
+                const y = (h - 30) - ((val - minVal) / range) * plotH;
+
+                if (i === 0) gCtx.moveTo(x, y);
+                else gCtx.lineTo(x, y);
+            });
+            gCtx.stroke();
+
+            // Y axis min/max labels
+            gCtx.fillStyle = '#cbd5e1';
+            gCtx.font = '10px Inter';
+            gCtx.fillText(maxVal.toFixed(1), 5, 25);
+            gCtx.fillText(minVal.toFixed(1), 5, h - 35);
+        }
+
+        /* =========================================================
+         *  EDUCATIONAL QUIZ SECTION (10 Questions Uzbek)
+         * ========================================================= */
+        const quizQuestions = [
+            {
+                q: "1. Erkin harakat diagrammasida (Free Body Diagram) qanday kuchlar tasvirlanadi?",
+                options: ["Jism atrofdagi barcha jismlarga ko‘rsatadigan kuchlar", "Faqat berilgan jismga ta’sir qiluvchi barcha tashqi kuchlar", "Faqat og‘irlik kuchi", "Jismning tezligi va tezlanishi"],
+                correct: 1,
+                explain: "Erkin harakat diagrammasida AYNAN ko‘rilayotgan jismga ta’sir qiluvchi barcha tashqi kuchlar vektor shaklida ko‘rsatiladi."
+            },
+            {
+                q: "2. Ishqalanishsiz silliq qiya tekislikdagi jismni qaysi kuch pastga tezlatadi?",
+                options: ["Normal reaksiya kuchi (N)", "Og‘irlik kuchining tekislikka parallel tarkibiy qismi (mg·sin α)", "Tashqi ishqalanish kuchi", "P = mg to‘liq og‘irlik kuchi"],
+                correct: 1,
+                explain: "Qiya tekislik bo‘ylab harakatlantiruvchi kuch Og‘irlik kuchining parallel proyeksiyasi bo‘lib, u mg·sin(α) ga teng."
+            },
+            {
+                q: "3. Jism tinch holatda turgan bo‘lsa, unga ta’sir qiluvchi natijaviy kuch (ΣF) nimaga teng?",
+                options: ["0 N ga teng", "mg ga teng", "Ishqalanish kuchiga teng", "Tezlanishga teng"],
+                correct: 0,
+                explain: "Nyutonning birinchi qonuniga ko‘ra, jism tinch turganda yoki tekis to‘g‘ri chiziqli harakat qilganda natijaviy kuch nolga teng."
+            },
+            {
+                q: "4. Qiya tekislik burchagi (α) orttirilsa, Normal reaksiya kuchi (N = mg·cos α) qanday o‘zgaradi?",
+                options: ["Ortadi", "Kamayadi", "O‘zgarmaydi", "Nolga teng bo‘ladi"],
+                correct: 1,
+                explain: "Burchak α ortgan sari cos(α) qiymati kamayadi, shuning uchun normal reaksiya kuchi N ham kamayadi."
+            },
+            {
+                q: "5. Ishqalanish kuchi yo‘nalishi har doim qanday yo‘nalgan bo‘ladi?",
+                options: ["Harakat yoki nisbiy sirpanish yo‘nalishiga qarshi", "Og‘irlik kuchi yo‘nalishida", "Normal reaksiya kuchi yo‘nalishida", "Doimo yuqoriga"],
+                correct: 0,
+                explain: "Ishqalanish kuchi har doim jismning harakatiga yoki sirpanishga moyil bo‘lgan yo‘nalishiga qarama-qarshi yo meyorlanadi."
+            },
+            {
+                q: "6. Nyutonning 2-qonunining matematik ifodasi qaysi?",
+                options: ["F = m / a", "a = ΣF / m", "F = m · v", "a = m · F"],
+                correct: 1,
+                explain: "Nyutonning ikkinchi qonuni: Jism tezlanishi natijaviy kuchga to‘g‘ri, massaga teskari mutanosibdir (a = ΣF / m)."
+            },
+            {
+                q: "7. Gorizontal tekislikda turgan jism uchun Normal reaksiya kuchi (N) nimaga teng (qo‘shimcha vertikal kuch bo‘lmasa)?",
+                options: ["N = 0", "N = mg", "N = mg·sin(α)", "N = m / g"],
+                correct: 1,
+                explain: "Gorizontal silliq tekislikda vertikal muvozanat tufayli Normal reaksiya kuchi N og‘irlik kuchi P=mg ga teng bo‘ladi."
+            },
+            {
+                q: "8. Og‘irlik kuchi (P = mg) yo‘nalishi har doim qayerga yo‘nalgan?",
+                options: ["Qiya tekislikka perpendikulyar", "Har doim tik vertikal pastga (Yer markaziga)", "Harakat yo‘nalishi bo‘ylab", "Yuqoriga"],
+                correct: 1,
+                explain: "Gravitatsiya (og‘irlik) kuchi har qanday sharoitda va har qanday tekislikda tik vertikal pastga yo‘naladi."
+            },
+            {
+                q: "9. Tinchlikdagi ishqalanish kuchining maksimal qiymati qaysi formula bilan topiladi?",
+                options: ["F_ishq = μ · N", "F_ishq = m · g", "F_ishq = k · x", "F_ishq = m · a"],
+                correct: 0,
+                explain: "Maksimal tinchlikdagi hamda sirpanish ishqalanish kuchi F_ishq = μ · N formulasi orqali hisoblanadi."
+            },
+            {
+                q: "10. Ipga osib qo‘yilgan jism muvozanatda bo‘lsa, ipning taranglik kuchi T va og‘irlik kuchi P munosabati qanday?",
+                options: ["T > P", "T < P", "T = P", "T = 0"],
+                correct: 2,
+                explain: "Jism muvozanatda bo‘lgani uchun yuqoriga yo‘nalgan taranglik kuchi T pastga yo‘nalgan og‘irlik kuchi P=mg ni to‘liq tenglashtiradi (T = P)."
+            }
+        ];
+
+        let quizUserAnswers = new Array(quizQuestions.length).fill(null);
+
+        function initQuiz() {
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = '';
+
+            quizQuestions.forEach((item, qIdx) => {
+                const card = document.createElement('div');
+                card.className = "p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs flex flex-col justify-between";
+                
+                let optionsHTML = item.options.map((opt, oIdx) => `
+                    <button onclick="answerQuiz(${qIdx}, ${oIdx})" id="q-btn-${qIdx}-${oIdx}" class="w-full text-left p-2 rounded-lg border border-slate-200 bg-white hover:bg-indigo-50 transition text-slate-700 font-medium">
+                        ${opt}
+                    </button>
+                `).join('');
+
+                card.innerHTML = `
+                    <div>
+                        <div class="font-bold text-slate-800 mb-2">${item.q}</div>
+                        <div class="space-y-1.5 mb-3">${optionsHTML}</div>
+                    </div>
+                    <div id="q-exp-${qIdx}" class="hidden p-2 rounded-lg text-[11px] font-medium mt-2"></div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function answerQuiz(qIdx, optionIdx) {
+            if (quizUserAnswers[qIdx] !== null) return; // Already answered
+
+            quizUserAnswers[qIdx] = optionIdx;
+            const q = quizQuestions[qIdx];
+            const isCorrect = optionIdx === q.correct;
+
+            // Highlight chosen option
+            const btn = document.getElementById(`q-btn-${qIdx}-${optionIdx}`);
+            if (isCorrect) {
+                btn.className = "w-full text-left p-2 rounded-lg border border-emerald-300 bg-emerald-100 text-emerald-900 font-bold";
+            } else {
+                btn.className = "w-full text-left p-2 rounded-lg border border-red-300 bg-red-100 text-red-900 font-bold";
+                // Show right answer too
+                const rightBtn = document.getElementById(`q-btn-${qIdx}-${q.correct}`);
+                rightBtn.className = "w-full text-left p-2 rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-800 font-bold";
+            }
+
+            // Show explanation
+            const expBox = document.getElementById(`q-exp-${qIdx}`);
+            expBox.classList.remove('hidden');
+            if (isCorrect) {
+                expBox.className = "p-2 rounded-lg text-[11px] bg-emerald-100 text-emerald-800 border border-emerald-200";
+                expBox.innerHTML = `<b>✓ To‘g‘ri!</b> ${q.explain}`;
+            } else {
+                expBox.className = "p-2 rounded-lg text-[11px] bg-red-100 text-red-800 border border-red-200";
+                expBox.innerHTML = `<b>✗ Noto‘g‘ri!</b> ${q.explain}`;
+            }
+
+            updateQuizScore();
+        }
+
+        function updateQuizScore() {
+            let correctCount = 0;
+            quizUserAnswers.forEach((ans, idx) => {
+                if (ans === quizQuestions[idx].correct) correctCount++;
+            });
+            document.getElementById('quizScore').innerText = `${correctCount} / ${quizQuestions.length}`;
+        }
+
+        function resetQuiz() {
+            quizUserAnswers = new Array(quizQuestions.length).fill(null);
+            initQuiz();
+            document.getElementById('quizScore').innerText = `0 / ${quizQuestions.length}`;
+        }
+
+        /* =========================================================
+         *  PRACTICAL EXPERIMENT TABLE & CSV EXPORTER
+         * ========================================================= */
+        let expRecords = [];
+
+        function addExpRecord() {
+            const modeNames = ["", "Gorizontal (silliq)", "Gorizontal (ishqalanish)", "Qiya tekislik", "Vertikal otish", "Ipga osilgan"];
+            const record = {
+                id: expRecords.length + 1,
+                modeName: modeNames[mode],
+                m: mass,
+                alpha: angleDeg,
+                mu: mu,
+                F: F_ext,
+                Fnet: F_net,
+                a: acc
+            };
+            expRecords.push(record);
+            renderExpTable();
+        }
+
+        function renderExpTable() {
+            const tbody = document.getElementById('expTableBody');
+            if (expRecords.length === 0) {
+                tbody.innerHTML = `<tr id="emptyRow"><td colspan="8" class="text-center p-4 text-slate-400 italic">Hali tajriba natijalari saqlanmadi. Yuqoridagi "Jadvalga qo‘shish" tugmasini bosing.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = expRecords.map(r => `
+                <tr class="hover:bg-slate-50 border-b border-slate-100 text-slate-700">
+                    <td class="p-2.5 font-bold">${r.id}</td>
+                    <td class="p-2.5">${r.modeName}</td>
+                    <td class="p-2.5">${r.m.toFixed(1)}</td>
+                    <td class="p-2.5">${r.alpha}°</td>
+                    <td class="p-2.5">${r.mu.toFixed(2)}</td>
+                    <td class="p-2.5">${r.F.toFixed(0)}</td>
+                    <td class="p-2.5 font-semibold text-indigo-600">${r.Fnet.toFixed(2)}</td>
+                    <td class="p-2.5 font-semibold text-emerald-600">${r.a.toFixed(2)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function clearExpTable() {
+            expRecords = [];
+            renderExpTable();
+        }
+
+        function exportCSV() {
+            if (expRecords.length === 0) {
+                alert("Eksport qilish uchun avval jadvalga kamida bitta tajriba natijasini qo‘shing!");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Tajriba №,Harakat Rejimi,Massa (kg),Burchak (gradus),Ishqalanish mu,Tashqi Kuch (N),Natijaviy Kuch (N),Tezlanish (m/s2)\n";
+
+            expRecords.forEach(r => {
+                csvContent += `${r.id},"${r.modeName}",${r.m},${r.alpha},${r.mu},${r.F},${r.Fnet.toFixed(2)},${r.a.toFixed(2)}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "fizika_tajriba_natijalari.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+    </script>
+</body>
+</html>
