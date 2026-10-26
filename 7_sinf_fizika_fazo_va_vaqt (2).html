@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7-sinf Fizika: 2-§. Fazo va vaqt</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax for LaTeX Rendering -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        canvas {
+            touch-action: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased leading-relaxed">
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 text-white p-2 rounded-lg font-bold text-lg shadow-md shadow-indigo-200">
+                    7F
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-slate-900">7-sinf Fizika</h1>
+                    <p class="text-xs text-slate-500">2-§. Fazo va vaqt (Interaktiv Dars)</p>
+                </div>
+            </div>
+            <div class="hidden md:flex space-x-6 text-sm font-medium text-slate-600">
+                <a href="#cheksizlik" class="hover:text-indigo-600 transition-colors">1. Fazoning cheksizligi</a>
+                <a href="#koordinatalar" class="hover:text-indigo-600 transition-colors">2. 3D Koordinatalar</a>
+                <a href="#vaqt" class="hover:text-indigo-600 transition-colors">3. Vaqt o'qi</a>
+                <a href="#testlar" class="hover:text-indigo-600 transition-colors">Testlar</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-5xl mx-auto px-4 py-8 space-y-12">
+
+        <!-- Title Banner -->
+        <section class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-3xl p-8 md:p-12 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10">
+                <i data-lucide="orbit" class="w-96 h-96"></i>
+            </div>
+            <div class="relative z-10 max-w-2xl">
+                <span class="px-3 py-1 bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 rounded-full text-xs font-semibold uppercase tracking-wider">
+                    2-Mavzu
+                </span>
+                <h2 class="text-3xl md:text-5xl font-extrabold tracking-tight mt-4 mb-4">
+                    Fazo va vaqt
+                </h2>
+                <p class="text-indigo-100 text-base md:text-lg mb-6 leading-relaxed">
+                    Ushbu zamonaviy va interaktiv dars orqali fazoning uch o'lchamli tabiatini, vaqt o'qining xususiyatlarini hamda obyektlarning fazodagi o'rnini aniqlashni o'rganasiz.
+                </p>
+            </div>
+        </section>
+
+        <!-- Dars Maqsadlari & Tayanch Tushunchalar -->
+        <section class="grid md:grid-cols-2 gap-6">
+            <!-- Maqsadlar -->
+            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="p-2 bg-emerald-100 text-emerald-700 rounded-lg">
+                        <i data-lucide="target" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800">Darsning Maqsadlari</h3>
+                </div>
+                <ul class="space-y-3 text-slate-600 text-sm">
+                    <li class="flex items-start">
+                        <span class="inline-block w-2 h-2 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <span><strong>Ta’limiy:</strong> Fazoning 3D ($X, Y, Z$) va vaqtning 1D ($t$) xususiyatlarini, obyektlarning koordinatalarini aniqlashni o‘rgatish.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="inline-block w-2 h-2 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <span><strong>Tarbiyaviy:</strong> Vaqtning qaytmasligi va uni to‘g‘ri rejalashtirish ko‘nikmasini shakllantirish, ilmiy dunyoqarashni o'stirish.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="inline-block w-2 h-2 bg-emerald-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <span><strong>Rivojlantiruvchi:</strong> Fazoviy tasavvur, mantiqiy fikrlash hamda interaktiv simulyatsiyalar orqali kuzatuvchanlikni oshirish.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Tayanch Tushunchalar -->
+            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="p-2 bg-indigo-100 text-indigo-700 rounded-lg">
+                        <i data-lucide="book-open" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800">Tayanch Tushunchalar</h3>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-xs font-semibold">1. Fazo (3D)</span>
+                    <span class="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-xs font-semibold">2. Vaqt (1D)</span>
+                    <span class="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-xs font-semibold">3. Koordinatalar sistemasi</span>
+                    <span class="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-xs font-semibold">4. Sanoq boshi (O)</span>
+                    <span class="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-xs font-semibold">5. Vaqt o'qi ($t$)</span>
+                    <span class="px-3 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-xs font-semibold">6. Bir o'lchamli harakat</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 1: Fazoning Cheksizligi -->
+        <section id="cheksizlik" class="bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-6">
+            <div class="border-b border-slate-100 pb-4">
+                <span class="text-xs font-bold text-indigo-600 uppercase tracking-widest">1-Reja</span>
+                <h3 class="text-2xl font-bold text-slate-900 mt-1">1. Fazoning cheksizligi</h3>
+            </div>
+
+            <p class="text-slate-700 leading-relaxed">
+                Fazo — bu barcha moddiy obyektlar joylashadigan, cheki va chegarasi bo‘lmagan uch o‘lchamli muhitdir. Biz kundalik turmushimizda mikrodunyodan (atomlar va molekulalar) tortib makrodunyogacha (sayyoralar, yulduzlar va galaktikalar) bo‘lgan barcha hodisalarni fazoda kuzatamiz. Fazoning eng asosiy xususiyatlaridan biri shundaki, unda obyektlar ma'lum masofada joylashadi va istalgan yo‘nalishda (uzunlik, kenglik, balandlik) harakat qila oladi.
+            </p>
+            <p class="text-slate-700 leading-relaxed">
+                Tasavvur qiling, siz Yerdan fazoga qarab uchib ketyapsiz. Yer sharidan uzoqlashganingiz sari Quyosh sistemasi, so‘ngra Somon Yo‘li galaktikasi va nihoyat milliardlab galaktikalardan iborat koinot namoyon bo‘ladi. Fizikada fazoning cheksizligi tushunchasi koinotning ma'lum bir tugash chegarasi yo‘qligini va har qanday masofadan keyin yana yangi fazoviy soha mavjudligini anglatadi.
+            </p>
+
+            <!-- SIMULATION 1: Canvas Zoom -->
+            <div class="bg-slate-900 rounded-xl p-4 text-white space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="zoom-in" class="text-indigo-400"></i>
+                        <h4 class="font-bold text-sm">Simulyatsiya: Fazoning Miqyoslari (Zoom)</h4>
+                    </div>
+                    <div class="text-xs bg-indigo-950 border border-indigo-800 text-indigo-300 px-3 py-1 rounded-full font-mono" id="scaleDisplay">
+                        Masshtab: 10⁰ metr (Inson miqyosi)
+                    </div>
+                </div>
+
+                <div class="relative w-full h-[320px] bg-black rounded-lg overflow-hidden border border-slate-800">
+                    <canvas id="zoomCanvas" class="w-full h-full block"></canvas>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs text-slate-400">
+                        <span>Mikrodunya (10⁻¹⁰m)</span>
+                        <span>Makrodunya (10²⁶m)</span>
+                    </div>
+                    <input type="range" id="zoomSlider" min="-10" max="26" value="0" step="1" 
+                           class="w-full accent-indigo-500 bg-slate-800 h-2 rounded-lg cursor-pointer">
+                </div>
+
+                <div id="scaleDescription" class="text-xs text-slate-300 bg-slate-800/60 p-3 rounded-lg border border-slate-700">
+                    Obyekt: Inson miqyosi (1 metr). Kundalik hayotiy obyektlar va masofalar.
+                </div>
+            </div>
+
+            <!-- Fizik Xulosa 1 -->
+            <div class="p-4 bg-indigo-50 border-l-4 border-indigo-600 rounded-r-xl">
+                <p class="text-sm text-indigo-900 font-medium">
+                    <strong>Fizik xulosa:</strong> Fazo chegarasiz bo‘lib, undagi har bir obyekt ma'lum bir masshtabda joylashadi. Masshtab qanchalik o‘zgarmasin, fazoviy o‘lchamlar va geometrik munosabatlar saqlanib qoladi.
+                </p>
+            </div>
+        </section>
+
+        <!-- SECTION 2: 3D Koordinatalar -->
+        <section id="koordinatalar" class="bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-6">
+            <div class="border-b border-slate-100 pb-4">
+                <span class="text-xs font-bold text-indigo-600 uppercase tracking-widest">2-Reja</span>
+                <h3 class="text-2xl font-bold text-slate-900 mt-1">2. Fazoni uch o‘lchamli koordinatalarda tasvirlash</h3>
+            </div>
+
+            <p class="text-slate-700 leading-relaxed">
+                Jismning fazodagi o‘rnini bir qiymatli va aniq belgilash uchun **uch o‘lchamli koordinatalar sistemasi** ishlatiladi. Bu sistema bir-biriga perpendikular bo‘lgan uchta to‘g‘ri chiziqdan (o‘qlardan) iborat:
+            </p>
+            <ul class="list-disc list-inside space-y-1 text-slate-700 ml-2">
+                <li><strong>$X$ o‘qi:</strong> Eni (Absissalar o‘qi)</li>
+                <li><strong>$Y$ o‘qi:</strong> Uzunligi (Ordinatalar o‘qi)</li>
+                <li><strong>$Z$ o‘qi:</strong> Balandligi (Applikatalar o‘qi)</li>
+            </ul>
+            <p class="text-slate-700 leading-relaxed">
+                Uchta o‘qning kesishgan nuqtasi **Sanoq boshi ($O$)** deb ataladi va uning koordinatalari $(0, 0, 0)$ ga teng. Fazodagi har qanday nuqta yoki jism ushbu uchta son — $(x, y, z)$ koordinatalari bilan to‘liq ta'riflanadi. Masalan, xonada uchib yurgan pashsha yoki havoda harakatlanayotgan dronning har bir soniyadagi o‘rnini aniqlash uchun uning devorlardan bo‘lgan masofasi ($x$ va $y$) hamda poldan balandligi ($z$) biliniishi shart.
+            </p>
+
+            <!-- SIMULATION 2: 3D Coordinate Canvas -->
+            <div class="bg-slate-900 rounded-xl p-4 text-white space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="box" class="text-indigo-400"></i>
+                        <h4 class="font-bold text-sm">Simulyatsiya: 3D Koordinatada Nuqta</h4>
+                    </div>
+                    <div class="text-xs bg-indigo-950 border border-indigo-800 text-indigo-300 px-3 py-1 rounded-full font-mono" id="coordDisplay">
+                        P = (4, 5, 6) | |r| = 8.77
+                    </div>
+                </div>
+
+                <div class="relative w-full h-[350px] bg-black rounded-lg overflow-hidden border border-slate-800">
+                    <canvas id="coord3DCanvas" class="w-full h-full block"></canvas>
+                </div>
+
+                <!-- Sliders for X, Y, Z -->
+                <div class="grid md:grid-cols-3 gap-4 bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                    <div>
+                        <label class="text-xs text-rose-400 font-bold flex justify-between">
+                            <span>X (Absissalar o'qi):</span>
+                            <span id="valX">4</span>
+                        </label>
+                        <input type="range" id="sliderX" min="-8" max="8" value="4" step="1" class="w-full accent-rose-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-emerald-400 font-bold flex justify-between">
+                            <span>Y (Ordinatalar o'qi):</span>
+                            <span id="valY">5</span>
+                        </label>
+                        <input type="range" id="sliderY" min="-8" max="8" value="5" step="1" class="w-full accent-emerald-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-sky-400 font-bold flex justify-between">
+                            <span>Z (Applikatalar o'qi):</span>
+                            <span id="valZ">6</span>
+                        </label>
+                        <input type="range" id="sliderZ" min="-8" max="8" value="6" step="1" class="w-full accent-sky-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fizik Xulosa 2 -->
+            <div class="p-4 bg-indigo-50 border-l-4 border-indigo-600 rounded-r-xl">
+                <p class="text-sm text-indigo-900 font-medium">
+                    <strong>Fizik xulosa:</strong> Fazodagi jismning o‘rnini to‘liq va aniq aniqlash uchun uchta mustaqil koordinata ($x, y, z$) talab etiladi. Sanoq sistemasi tanlanishi jism koordinatalarining son qiymatiga ta'sir qiladi, ammo ularning nisbiy o‘rnini o‘zgartirmaydi.
+                </p>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Vaqtni bir o'lchamda tasvirlash -->
+        <section id="vaqt" class="bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-6">
+            <div class="border-b border-slate-100 pb-4">
+                <span class="text-xs font-bold text-indigo-600 uppercase tracking-widest">3-Reja</span>
+                <h3 class="text-2xl font-bold text-slate-900 mt-1">3. Vaqtni bir o‘lchamli koordinatada tasvirlash</h3>
+            </div>
+
+            <p class="text-slate-700 leading-relaxed">
+                Fazo uch o‘lchamli bo‘lsa, **vaqt bir o‘lchamli ($t$)** fizik kattalikdir. Bu shuni anglatadiki, vaqt faqat bitta yo‘nalishda — o‘tmishdan hozirgi vaqt orqali kelajakka qarab uzluksiz oqadi. Fizikada vaqtni bitta to‘g‘ri chiziq — **vaqt o‘qi** ko‘rinishida tasvirlash qabul qilingan.
+            </p>
+            <p class="text-slate-700 leading-relaxed">
+                Vaqt o‘qida ma'lum bir **boshlang‘ich vaqt nuqtasi ($t_0 = 0$)** tanlab olinadi. Hodisalarning yuz berish vaqti soniya ($s$), daqiqa ($min$) yoki soat ($h$) kabi xalqaro birliklar sistemasi (SI) birliklarida o‘lchanadi. Fazodagi harakat va jarayonlar vaqt o‘tishi bilan ro‘y beradi, shuning uchun jismning koordinatasi vaqtga bog‘liq ravishda o‘zgaradi: $x(t)$.
+            </p>
+
+            <!-- SIMULATION 3: Timeline & Motion -->
+            <div class="bg-slate-900 rounded-xl p-4 text-white space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="clock" class="text-indigo-400"></i>
+                        <h4 class="font-bold text-sm">Simulyatsiya: Vaqt O'qi va Harakat ($x = v \cdot t$)</h4>
+                    </div>
+                    <div class="text-xs bg-indigo-950 border border-indigo-800 text-indigo-300 px-3 py-1 rounded-full font-mono" id="timeDisplay">
+                        t = 0.0s | Masofa x = 0.0m
+                    </div>
+                </div>
+
+                <div class="relative w-full h-[220px] bg-black rounded-lg overflow-hidden border border-slate-800">
+                    <canvas id="timeCanvas" class="w-full h-full block"></canvas>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                    <div class="flex items-center space-x-2">
+                        <button id="btnPlay" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold text-xs flex items-center space-x-1 transition-colors">
+                            <i data-lucide="play" class="w-4 h-4"></i>
+                            <span>Boshlash</span>
+                        </button>
+                        <button id="btnReset" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-bold text-xs transition-colors">
+                            Qaytadan
+                        </button>
+                    </div>
+
+                    <div class="flex-1 min-w-[200px] space-y-1">
+                        <div class="flex justify-between text-xs text-slate-300">
+                            <span>Vaqt ($t$):</span>
+                            <span id="valTime">0 s</span>
+                        </div>
+                        <input type="range" id="sliderTime" min="0" max="20" value="0" step="0.1" class="w-full accent-indigo-500">
+                    </div>
+
+                    <div class="w-36 space-y-1">
+                        <div class="flex justify-between text-xs text-slate-300">
+                            <span>Tezlik ($v$):</span>
+                            <span id="valSpeed">5 m/s</span>
+                        </div>
+                        <input type="range" id="sliderSpeed" min="1" max="10" value="5" step="1" class="w-full accent-emerald-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fizik Xulosa 3 -->
+            <div class="p-4 bg-indigo-50 border-l-4 border-indigo-600 rounded-r-xl">
+                <p class="text-sm text-indigo-900 font-medium">
+                    <strong>Fizik xulosa:</strong> Vaqt bir o‘lchamli bo‘lib, u jarayonlarning davomiyligini va ketma-ketligini belgilaydi. Vaqt koordinatasini orqaga qaytarib bo‘lmaydi — fizika qonunlarida vaqt doimo $t_1 < t_2$ sharti bilan faqat oldinga harakat qiladi.
+                </p>
+            </div>
+        </section>
+
+        <!-- HAYOTIY MISOLLAR -->
+        <section class="bg-slate-100 rounded-2xl p-6 border border-slate-200">
+            <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center space-x-2">
+                <i data-lucide="compass" class="text-indigo-600"></i>
+                <span>Hayotiy Misollar</span>
+            </h3>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <h4 class="font-bold text-indigo-600 text-sm mb-1">1. Samolyot Navigatsiyasi (3D)</h4>
+                    <p class="text-xs text-slate-600">Dispetcherlar samolyotning o'rnini aniqlash uchun uchta koordinatadan foydalanadilar: kenglik ($X$), uzunlik ($Y$) va balandlik ($Z$).</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <h4 class="font-bold text-indigo-600 text-sm mb-1">2. Poyezd Harakati (1D + Vaqt)</h4>
+                    <p class="text-xs text-slate-600">Poyezd faqat rels bo'ylab ($X$) harakat qiladi. Uning stansiyaga yetib kelishi esa vaqt o'qi ($t$) bo'yicha belgilab boriladi.</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <h4 class="font-bold text-indigo-600 text-sm mb-1">3. GPS va Xaritalar</h4>
+                    <p class="text-xs text-slate-600">Telefoningizdagi navigatsiya ilovasi sizning fazoviy joylashuvingiz va belgilangan manzilingizga yetish vaqtini aniqlaydi.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MUSTAHKAMLASH TESTLARI -->
+        <section id="testlar" class="bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-6">
+            <div class="border-b border-slate-100 pb-4">
+                <h3 class="text-2xl font-bold text-slate-900">Mustahkamlash uchun Testlar</h3>
+                <p class="text-xs text-slate-500 mt-1">Bilimingizni sinab ko'ring va to'g'ri javoblarni tanlang</p>
+            </div>
+
+            <div class="space-y-6" id="quizContainer">
+                <!-- Question 1 -->
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200" data-correct="C">
+                    <p class="font-bold text-sm text-slate-800 mb-3">1. Fazoning o‘lchamlar soni nechta?</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <button onclick="checkAnswer(this, 'A')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">A) 1 ta</button>
+                        <button onclick="checkAnswer(this, 'B')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">B) 2 ta</button>
+                        <button onclick="checkAnswer(this, 'C')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">C) 3 ta</button>
+                        <button onclick="checkAnswer(this, 'D')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">D) 4 ta</button>
+                    </div>
+                </div>
+
+                <!-- Question 2 -->
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200" data-correct="A">
+                    <p class="font-bold text-sm text-slate-800 mb-3">2. Vaqt o‘qi nechta o‘lchamga ega?</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <button onclick="checkAnswer(this, 'A')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">A) 1 ta</button>
+                        <button onclick="checkAnswer(this, 'B')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">B) 2 ta</button>
+                        <button onclick="checkAnswer(this, 'C')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">C) 3 ta</button>
+                        <button onclick="checkAnswer(this, 'D')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">D) Cheksiz</button>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200" data-correct="C">
+                    <p class="font-bold text-sm text-slate-800 mb-3">3. Uch o‘lchamli koordinatalar sistemasida balandlik qaysi o‘q bilan belgilanadi?</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <button onclick="checkAnswer(this, 'A')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">A) X o‘qi</button>
+                        <button onclick="checkAnswer(this, 'B')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">B) Y o‘qi</button>
+                        <button onclick="checkAnswer(this, 'C')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">C) Z o‘qi</button>
+                        <button onclick="checkAnswer(this, 'D')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">D) t o‘qi</button>
+                    </div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200" data-correct="C">
+                    <p class="font-bold text-sm text-slate-800 mb-3">4. Sanoq boshining koordinatalari qaysi javobda to‘g‘ri ko‘rsatilgan?</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <button onclick="checkAnswer(this, 'A')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">A) (1, 1, 1)</button>
+                        <button onclick="checkAnswer(this, 'B')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">B) (0, 1, 0)</button>
+                        <button onclick="checkAnswer(this, 'C')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">C) (0, 0, 0)</button>
+                        <button onclick="checkAnswer(this, 'D')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">D) (0, 0, 1)</button>
+                    </div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200" data-correct="C">
+                    <p class="font-bold text-sm text-slate-800 mb-3">5. SI xalqaro birliklar sistemasida vaqtning asosiy birligi nima?</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <button onclick="checkAnswer(this, 'A')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">A) Soat (h)</button>
+                        <button onclick="checkAnswer(this, 'B')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">B) Daqiqa (min)</button>
+                        <button onclick="checkAnswer(this, 'C')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">C) Soniya (s)</button>
+                        <button onclick="checkAnswer(this, 'D')" class="quiz-opt p-2 bg-white border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors text-left">D) Sutka (d)</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AMALIY TOPSHIRIKLAR VA MEZON -->
+        <section class="bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-sm space-y-6">
+            <h3 class="text-2xl font-bold text-slate-900">Amaliy Topshiriqlar va Baholash Mezoni</h3>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-2">
+                    <h4 class="font-bold text-indigo-700 text-sm">Topshiriq 1: Xona modelida koordinatalar</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        O‘z xonangizning burchagini sanoq boshi $(0,0,0)$ deb oling. Xonadagi partangiz yoki stolingizning koordinatalarini ($x$ — kenglik, $y$ — uzunlik, $z$ — poldan balandlik) metrda o‘lchab yozing.
+                    </p>
+                </div>
+                <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-2">
+                    <h4 class="font-bold text-indigo-700 text-sm">Topshiriq 2: Vaqt grafikini tuzish</h4>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Uydan maktabgacha bo‘lgan harakatingizni vaqt o‘qida tasvirlang:
+                        <br>• $t = 0$ min: Uydan chiqish.
+                        <br>• $t = 5$ min: Bekatga yetib borish.
+                        <br>• $t = 15$ min: Maktabga yetib kelish.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Baholash jadvali -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse border border-slate-200 rounded-lg">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700">
+                            <th class="p-3 border border-slate-200">Mezon</th>
+                            <th class="p-3 border border-slate-200">A'lo (5)</th>
+                            <th class="p-3 border border-slate-200">Yaxshi (4)</th>
+                            <th class="p-3 border border-slate-200">Qoniqarli (3)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-slate-600">
+                        <tr>
+                            <td class="p-3 border border-slate-200 font-bold">3D Koordinata o‘lchash</td>
+                            <td class="p-3 border border-slate-200">X, Y, Z koordinatalari aniq va birliklar bilan to‘g‘ri o‘lchangan.</td>
+                            <td class="p-3 border border-slate-200">1 ta koordinatada kichik xatolik bor.</td>
+                            <td class="p-3 border border-slate-200">O‘lchashda tushuncha yetarli emas.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border border-slate-200 font-bold">Vaqt chizig‘i grafigi</td>
+                            <td class="p-3 border border-slate-200">Vaqt o‘qi to‘g‘ri chizilgan, hodisalar ketma-ketligi aniq.</td>
+                            <td class="p-3 border border-slate-200">Vaqt intervallari masshtabga to‘liq mos emas.</td>
+                            <td class="p-3 border border-slate-200">Faqat hodisalar yozilgan, grafik yo‘q.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- UYGA VAZIFA & XULOSA -->
+        <section class="bg-indigo-900 text-white rounded-2xl p-6 md:p-8 space-y-4">
+            <h3 class="text-xl font-bold">Dars Yakuni va Uyga Vazifa</h3>
+            <p class="text-xs text-indigo-200 leading-relaxed">
+                <strong>Dars xulosasi:</strong> Fazo va vaqt — barcha moddiy dunyoning va harakatning mavjudlik shaklidir. Fazo uch o‘lchamli ($X, Y, Z$) bo‘lib, jismlarning o‘rnini va o‘lchamlarini belgilaydi. Vaqt esa bir o‘lchamli ($t$) bo‘lib, hodisalarning izchilligi va davomiyligini ko‘rsatadi.
+            </p>
+            <div class="bg-indigo-800/60 p-4 rounded-xl border border-indigo-700 text-xs text-indigo-100">
+                <p class="font-bold mb-1 text-white">Uyga vazifa:</p>
+                <ol class="list-decimal list-inside space-y-1">
+                    <li>Darslikdagi 2-§ mavzusini diqqat bilan o‘qib chiqish.</li>
+                    <li>O‘z xangizdagi 3 ta buyumning (masalan: chiroq, kitob, soat) koordinatalarini taxminiy $X, Y, Z$ ko‘rinishida daftarga yozib kelish.</li>
+                </ol>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JS Logic for Canvas Simulations and Interactivity -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // --- SIMULATION 1: ZOOM SCALE ---
+        const zoomCanvas = document.getElementById('zoomCanvas');
+        const zoomCtx = zoomCanvas.getContext('2d');
+        const zoomSlider = document.getElementById('zoomSlider');
+        const scaleDisplay = document.getElementById('scaleDisplay');
+        const scaleDescription = document.getElementById('scaleDescription');
+
+        const scalesData = {
+            "-10": { label: "10⁻¹⁰m (Atom o'lchami)", desc: "Mikrodunya: Atom yadrosi va elektron buluti masofalari.", color: "#6366f1" },
+            "-8": { label: "10⁻⁸m (DNK va Molekulalar)", desc: "Mikrodunya: Organik molekulalar va genetik tuzilmalar.", color: "#8b5cf6" },
+            "-4": { label: "10⁻⁴m (Hujayra / Soch tola)", desc: "Mikroskopik miqyos: Biologik hujayralar va nozik tola.", color: "#ec4899" },
+            "0": { label: "10⁰m (Inson miqyosi - 1 metr)", desc: "Makrodunya: Kundalik turmushimizdagi barcha buyumlar va inson o'lchami.", color: "#10b981" },
+            "4": { label: "10⁴m (Shahar / Tog'lar)", desc: "Geografik miqyos: Shaharlar va baland tog' cho'qqilari.", color: "#f59e0b" },
+            "7": { label: "10⁷m (Yer Sayyorasi)", desc: "Planetar miqyos: Yer shari va uning radiusi.", color: "#3b82f6" },
+            "13": { label: "10¹³m (Quyosh Sistemasi)", desc: "Kosmik miqyos: Quyosh va uning atrofidagi barcha sayyoralar.", color: "#eab308" },
+            "21": { label: "10²¹m (Somon Yo'li Galaktikasi)", desc: "Galaktik miqyos: Yuz milliardlab yulduzlar tizimi.", color: "#a855f7" },
+            "26": { label: "10²⁶m (Kuzatilaotgan Koinot)", desc: "Cheksiz Fazo: Billionlab galaktikalar majmuasi.", color: "#ef4444" }
+        };
+
+        function resizeCanvas(canvas) {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+
+        function drawZoomSimulation() {
+            resizeCanvas(zoomCanvas);
+            const width = zoomCanvas.width;
+            const height = zoomCanvas.height;
+            const exp = parseInt(zoomSlider.value);
+
+            zoomCtx.clearRect(0, 0, width, height);
+
+            // Background stars or grid
+            zoomCtx.strokeStyle = "rgba(255, 255, 255, 0.05)";
+            zoomCtx.lineWidth = 1;
+            for(let x = 0; x < width; x += 30) {
+                zoomCtx.beginPath(); zoomCtx.moveTo(x, 0); zoomCtx.lineTo(x, height); zoomCtx.stroke();
+            }
+            for(let y = 0; y < height; y += 30) {
+                zoomCtx.beginPath(); zoomCtx.moveTo(0, y); zoomCtx.lineTo(width, y); zoomCtx.stroke();
+            }
+
+            // Closest preset data
+            let closestKey = Object.keys(scalesData).reduce((prev, curr) => 
+                Math.abs(curr - exp) < Math.abs(prev - exp) ? curr : prev
+            );
+            let currentInfo = scalesData[closestKey];
+
+            scaleDisplay.innerText = `Masshtab: 10^(${exp}) metr`;
+            scaleDescription.innerText = `Obyekt: ${currentInfo.label}. ${currentInfo.desc}`;
+
+            // Draw Central Concentric Scaling Rings
+            const centerX = width / 2;
+            const centerY = height / 2;
+            
+            for (let i = 5; i >= 1; i--) {
+                const radius = (i * 30 + (exp * 2)) % 150 + 10;
+                zoomCtx.beginPath();
+                zoomCtx.arc(centerX, centerY, Math.abs(radius), 0, Math.PI * 2);
+                zoomCtx.strokeStyle = currentInfo.color;
+                zoomCtx.globalAlpha = 0.2 * (6 - i);
+                zoomCtx.stroke();
+            }
+
+            // Central Node
+            zoomCtx.globalAlpha = 1.0;
+            zoomCtx.beginPath();
+            zoomCtx.arc(centerX, centerY, 12, 0, Math.PI * 2);
+            zoomCtx.fillStyle = currentInfo.color;
+            zoomCtx.fill();
+            zoomCtx.shadowColor = currentInfo.color;
+            zoomCtx.shadowBlur = 15;
+
+            // Label on Canvas
+            zoomCtx.fillStyle = "#ffffff";
+            zoomCtx.font = "14px monospace";
+            zoomCtx.textAlign = "center";
+            zoomCtx.fillText(currentInfo.label, centerX, centerY + 35);
+        }
+
+        zoomSlider.addEventListener('input', drawZoomSimulation);
+
+
+        // --- SIMULATION 2: 3D COORDINATE SYSTEM ---
+        const coordCanvas = document.getElementById('coord3DCanvas');
+        const coordCtx = coordCanvas.getContext('2d');
+        const sliderX = document.getElementById('sliderX');
+        const sliderY = document.getElementById('sliderY');
+        const sliderZ = document.getElementById('sliderZ');
+        const valX = document.getElementById('valX');
+        const valY = document.getElementById('valY');
+        const valZ = document.getElementById('valZ');
+        const coordDisplay = document.getElementById('coordDisplay');
+
+        function project3D(x, y, z, width, height) {
+            // Isometric projection parameters
+            const originX = width / 2;
+            const originY = height / 2 + 30;
+            const scale = 16;
+
+            // Projection math
+            const screenX = originX + (x - y) * Math.cos(Math.PI / 6) * scale;
+            const screenY = originY + (x + y) * Math.sin(Math.PI / 6) * scale - (z * scale);
+
+            return { x: screenX, y: screenY };
+        }
+
+        function draw3DCoordinateSystem() {
+            resizeCanvas(coordCanvas);
+            const w = coordCanvas.width;
+            const h = coordCanvas.height;
+
+            coordCtx.clearRect(0, 0, w, h);
+
+            const xVal = parseFloat(sliderX.value);
+            const yVal = parseFloat(sliderY.value);
+            const zVal = parseFloat(sliderZ.value);
+
+            valX.innerText = xVal;
+            valY.innerText = yVal;
+            valZ.innerText = zVal;
+
+            const mag = Math.sqrt(xVal*xVal + yVal*yVal + zVal*zVal).toFixed(2);
+            coordDisplay.innerText = `P = (${xVal}, ${yVal}, ${zVal}) | |r| = ${mag}`;
+
+            const O = project3D(0, 0, 0, w, h);
+            const X_axis = project3D(8, 0, 0, w, h);
+            const Y_axis = project3D(0, 8, 0, w, h);
+            const Z_axis = project3D(0, 0, 8, w, h);
+
+            // Draw Axes
+            function drawAxis(target, color, label) {
+                coordCtx.beginPath();
+                coordCtx.moveTo(O.x, O.y);
+                coordCtx.lineTo(target.x, target.y);
+                coordCtx.strokeStyle = color;
+                coordCtx.lineWidth = 2;
+                coordCtx.stroke();
+
+                coordCtx.fillStyle = color;
+                coordCtx.font = "bold 12px sans-serif";
+                coordCtx.fillText(label, target.x + 5, target.y + 5);
+            }
+
+            drawAxis(X_axis, '#f43f5e', 'X (Eni)');
+            drawAxis(Y_axis, '#10b981', 'Y (Uzunligi)');
+            drawAxis(Z_axis, '#38bdf8', 'Z (Balandlik)');
+
+            // Projection Lines
+            const P = project3D(xVal, yVal, zVal, w, h);
+            const P_xy = project3D(xVal, yVal, 0, w, h);
+            const P_x = project3D(xVal, 0, 0, w, h);
+            const P_y = project3D(0, yVal, 0, w, h);
+
+            coordCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            coordCtx.setLineDash([4, 4]);
+            coordCtx.lineWidth = 1;
+
+            // Box projection
+            coordCtx.beginPath();
+            coordCtx.moveTo(P_x.x, P_x.y); coordCtx.lineTo(P_xy.x, P_xy.y);
+            coordCtx.moveTo(P_y.x, P_y.y); coordCtx.lineTo(P_xy.x, P_xy.y);
+            coordCtx.moveTo(P_xy.x, P_xy.y); coordCtx.lineTo(P.x, P.y);
+            coordCtx.stroke();
+            coordCtx.setLineDash([]);
+
+            // Vector Vector |r|
+            coordCtx.beginPath();
+            coordCtx.moveTo(O.x, O.y);
+            coordCtx.lineTo(P.x, P.y);
+            coordCtx.strokeStyle = '#a855f7';
+            coordCtx.lineWidth = 3;
+            coordCtx.stroke();
+
+            // Point P
+            coordCtx.beginPath();
+            coordCtx.arc(P.x, P.y, 6, 0, Math.PI * 2);
+            coordCtx.fillStyle = '#a855f7';
+            coordCtx.fill();
+            coordCtx.strokeStyle = '#ffffff';
+            coordCtx.lineWidth = 2;
+            coordCtx.stroke();
+
+            // Label
+            coordCtx.fillStyle = '#ffffff';
+            coordCtx.font = "12px monospace";
+            coordCtx.fillText(`P(${xVal},${yVal},${zVal})`, P.x + 10, P.y - 5);
+        }
+
+        [sliderX, sliderY, sliderZ].forEach(s => s.addEventListener('input', draw3DCoordinateSystem));
+
+
+        // --- SIMULATION 3: TIME & 1D MOTION ---
+        const timeCanvas = document.getElementById('timeCanvas');
+        const timeCtx = timeCanvas.getContext('2d');
+        const sliderTime = document.getElementById('sliderTime');
+        const sliderSpeed = document.getElementById('sliderSpeed');
+        const valTime = document.getElementById('valTime');
+        const valSpeed = document.getElementById('valSpeed');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const btnPlay = document.getElementById('btnPlay');
+        const btnReset = document.getElementById('btnReset');
+
+        let animationFrame = null;
+        let isPlaying = false;
+
+        function drawTimeSimulation() {
+            resizeCanvas(timeCanvas);
+            const w = timeCanvas.width;
+            const h = timeCanvas.height;
+
+            timeCtx.clearRect(0, 0, w, h);
+
+            const t = parseFloat(sliderTime.value);
+            const v = parseFloat(sliderSpeed.value);
+            const x = v * t;
+
+            valTime.innerText = `${t.toFixed(1)} s`;
+            valSpeed.innerText = `${v} m/s`;
+            timeDisplay.innerText = `t = ${t.toFixed(1)}s | Masofa x = ${x.toFixed(1)}m`;
+
+            // Draw Time Axis Line
+            const axisY = h / 2;
+            timeCtx.strokeStyle = "#64748b";
+            timeCtx.lineWidth = 2;
+            timeCtx.beginPath();
+            timeCtx.moveTo(40, axisY);
+            timeCtx.lineTo(w - 40, axisY);
+            timeCtx.stroke();
+
+            // Axis ticks for time 0 - 20s
+            for(let i = 0; i <= 20; i += 2) {
+                const tickX = 40 + (i / 20) * (w - 80);
+                timeCtx.beginPath();
+                timeCtx.moveTo(tickX, axisY - 5);
+                timeCtx.lineTo(tickX, axisY + 5);
+                timeCtx.strokeStyle = "#94a3b8";
+                timeCtx.stroke();
+
+                timeCtx.fillStyle = "#94a3b8";
+                timeCtx.font = "10px monospace";
+                timeCtx.textAlign = "center";
+                timeCtx.fillText(`${i}s`, tickX, axisY + 20);
+            }
+
+            // Moving Object (Car/Point) Position
+            const objX = 40 + (t / 20) * (w - 80);
+
+            // Trail
+            timeCtx.beginPath();
+            timeCtx.moveTo(40, axisY);
+            timeCtx.lineTo(objX, axisY);
+            timeCtx.strokeStyle = "#6366f1";
+            timeCtx.lineWidth = 4;
+            timeCtx.stroke();
+
+            // Object Marker
+            timeCtx.beginPath();
+            timeCtx.arc(objX, axisY, 8, 0, Math.PI * 2);
+            timeCtx.fillStyle = "#818cf8";
+            timeCtx.fill();
+            timeCtx.strokeStyle = "#ffffff";
+            timeCtx.lineWidth = 2;
+            timeCtx.stroke();
+
+            // Floating Label
+            timeCtx.fillStyle = "#ffffff";
+            timeCtx.font = "11px sans-serif";
+            timeCtx.fillText(`x = ${x.toFixed(0)}m`, objX, axisY - 15);
+        }
+
+        function animate() {
+            if (!isPlaying) return;
+
+            let currentT = parseFloat(sliderTime.value);
+            if (currentT >= 20) {
+                isPlaying = false;
+                btnPlay.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i><span>Boshlash</span>`;
+                lucide.createIcons();
+                return;
+            }
+
+            sliderTime.value = (currentT + 0.05).toFixed(2);
+            drawTimeSimulation();
+            animationFrame = requestAnimationFrame(animate);
+        }
+
+        btnPlay.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                btnPlay.innerHTML = `<i data-lucide="pause" class="w-4 h-4"></i><span>To'xtatish</span>`;
+                animate();
+            } else {
+                btnPlay.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i><span>Boshlash</span>`;
+            }
+            lucide.createIcons();
+        });
+
+        btnReset.addEventListener('click', () => {
+            isPlaying = false;
+            cancelAnimationFrame(animationFrame);
+            sliderTime.value = 0;
+            btnPlay.innerHTML = `<i data-lucide="play" class="w-4 h-4"></i><span>Boshlash</span>`;
+            drawTimeSimulation();
+            lucide.createIcons();
+        });
+
+        sliderTime.addEventListener('input', drawTimeSimulation);
+        sliderSpeed.addEventListener('input', drawTimeSimulation);
+
+
+        // --- QUIZ LOGIC ---
+        function checkAnswer(btn, option) {
+            const parent = btn.closest('[data-correct]');
+            const correctOpt = parent.getAttribute('data-correct');
+            const buttons = parent.querySelectorAll('.quiz-opt');
+
+            buttons.forEach(b => {
+                b.disabled = true;
+                b.classList.remove('hover:bg-slate-100');
+            });
+
+            if (option === correctOpt) {
+                btn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600');
+            } else {
+                btn.classList.add('bg-rose-500', 'text-white', 'border-rose-600');
+                // Highlight correct one
+                buttons.forEach(b => {
+                    if(b.innerText.startsWith(correctOpt)) {
+                        b.classList.add('bg-emerald-100', 'text-emerald-800', 'border-emerald-300');
+                    }
+                });
+            }
+        }
+
+
+        // Initial Render on Window Load
+        window.addEventListener('load', () => {
+            drawZoomSimulation();
+            draw3DCoordinateSystem();
+            drawTimeSimulation();
+        });
+
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            drawZoomSimulation();
+            draw3DCoordinateSystem();
+            drawTimeSimulation();
+        });
+    </script>
+</body>
+</html>
